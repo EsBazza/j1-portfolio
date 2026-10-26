@@ -303,10 +303,10 @@
   }
 }
 
+/* Transform only: the text is painted from the first frame (good for LCP). */
 @keyframes hero-fade {
   from {
-    opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(16px);
   }
 }
 

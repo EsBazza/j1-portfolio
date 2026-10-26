@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import type Lenis from "lenis";
 import "lenis/dist/lenis.css";
+import { onFirstInteraction } from "./interaction";
 
 let lenis: Lenis | null = null;
 
@@ -59,27 +60,31 @@ export function MotionLayer() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let cancelled = false;
     let cleanup: (() => void) | undefined;
-    Promise.all([import("lenis"), import("@/lib/gsap")]).then(
-      ([{ default: LenisClass }, { gsap, ScrollTrigger }]) => {
-        if (cancelled) return;
-        const instance = new LenisClass({
-          autoRaf: false,
-          anchors: { offset: -80 },
-        });
-        instance.on("scroll", ScrollTrigger.update);
-        const tick = (time: number) => instance.raf(time * 1000);
-        gsap.ticker.add(tick);
-        gsap.ticker.lagSmoothing(0);
-        lenis = instance;
-        cleanup = () => {
-          gsap.ticker.remove(tick);
-          instance.destroy();
-          lenis = null;
-        };
-      },
+    // Loaded on the first interaction so it never competes with page load.
+    const stopWaiting = onFirstInteraction(() =>
+      Promise.all([import("lenis"), import("@/lib/gsap")]).then(
+        ([{ default: LenisClass }, { gsap, ScrollTrigger }]) => {
+          if (cancelled) return;
+          const instance = new LenisClass({
+            autoRaf: false,
+            anchors: { offset: -80 },
+          });
+          instance.on("scroll", ScrollTrigger.update);
+          const tick = (time: number) => instance.raf(time * 1000);
+          gsap.ticker.add(tick);
+          gsap.ticker.lagSmoothing(0);
+          lenis = instance;
+          cleanup = () => {
+            gsap.ticker.remove(tick);
+            instance.destroy();
+            lenis = null;
+          };
+        },
+      ),
     );
     return () => {
       cancelled = true;
+      stopWaiting();
       cleanup?.();
     };
   }, []);

@@ -11,17 +11,20 @@ import "./globals.css";
 const display = Bricolage_Grotesque({
   variable: "--font-bricolage",
   subsets: ["latin"],
-  axes: ["opsz"],
 });
 
+// Body and mono fonts never swap mid-view (no layout shift); they are preloaded,
+// so in practice they are ready before first paint.
 const sans = Geist({
   variable: "--font-geist",
   subsets: ["latin"],
+  display: "optional",
 });
 
 const mono = JetBrains_Mono({
   variable: "--font-jetbrains",
   subsets: ["latin"],
+  display: "optional",
 });
 
 const title = `${profile.shortName} — ${profile.role}`;

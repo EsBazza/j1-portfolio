@@ -167,7 +167,8 @@ export default async function CaseStudyPage({
                   <BrowserFrame>
                     <Image
                       src={shot.src}
-                      alt={shot.alt}
+                      // The visible caption below describes the image.
+                      alt=""
                       width={shot.width}
                       height={shot.height}
                       sizes="(min-width: 768px) 50vw, 100vw"
@@ -193,7 +194,7 @@ export default async function CaseStudyPage({
                 <figure className="flex flex-col gap-3">
                   <Image
                     src={photo.src}
-                    alt={photo.alt}
+                    alt=""
                     width={photo.width}
                     height={photo.height}
                     sizes="(min-width: 768px) 50vw, 100vw"

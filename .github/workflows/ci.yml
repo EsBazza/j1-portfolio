@@ -23,3 +23,5 @@ jobs:
       - run: npm run typecheck
       - run: npm run format:check
       - run: npm run build
+      # Browser tests against the production build (uses the runner's Chrome).
+      - run: npm run test:e2e

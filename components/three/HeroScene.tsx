@@ -17,7 +17,7 @@ function hasWebGL() {
 
 /**
  * Decides whether the 3D sphere runs at all, and when. It loads once the page
- * is idle; it is skipped for reduced motion or without WebGL, and it gives up
+ * is idle; it is skipped on phones, for reduced motion or without WebGL, and it gives up
  * (back to the static sphere) if the frame rate keeps dropping. It pauses
  * whenever the hero is off screen or the tab is hidden.
  */
@@ -29,6 +29,9 @@ export function HeroScene() {
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Phones keep the static sphere: it sits dimmed behind the text there,
+    // and skipping three.js saves bandwidth and battery.
+    if (!window.matchMedia("(min-width: 768px)").matches) return;
     if (!hasWebGL()) return;
     const start = () => setEnabled(true);
     if ("requestIdleCallback" in window) {

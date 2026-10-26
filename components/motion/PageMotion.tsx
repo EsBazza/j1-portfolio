@@ -2,7 +2,9 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { onFirstInteraction } from "./interaction";
 import { resizeSmoothScroll } from "./MotionLayer";
+import { initReveals } from "./reveal";
 
 /**
  * Per-page enhancements: reveals, split headings, count-ups, pinning, magnetic
@@ -19,16 +21,23 @@ export function PageMotion() {
     document.documentElement.classList.add("motion-ready");
     resizeSmoothScroll();
 
-    let cancelled = false;
-    let cleanup: (() => void) | undefined;
-    import("./engine").then(({ initMotion }) => {
-      if (!cancelled) cleanup = initMotion(main);
-    });
+    const stopReveals = initReveals(main);
     const stopSpy = pathname === "/" ? spyOnSections() : clearSpy();
+
+    // GSAP effects load on the first interaction, never during page load.
+    let cancelled = false;
+    let stopMotion: (() => void) | undefined;
+    const stopWaiting = onFirstInteraction(() => {
+      import("./engine").then(({ initMotion }) => {
+        if (!cancelled) stopMotion = initMotion(main);
+      });
+    });
 
     return () => {
       cancelled = true;
-      cleanup?.();
+      stopWaiting();
+      stopMotion?.();
+      stopReveals();
       stopSpy?.();
     };
   }, [pathname]);

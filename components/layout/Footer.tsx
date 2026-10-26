@@ -22,7 +22,7 @@ export function Footer() {
       <Container aria-hidden="true" className="pt-12">
         <p
           data-split-chars
-          className="font-display text-[clamp(5rem,24vw,22rem)] leading-[0.8] font-bold tracking-[-0.06em] text-surface-2 select-none"
+          className="font-display text-[clamp(5rem,24vw,22rem)] leading-[0.8] font-bold tracking-[-0.06em] text-line-strong select-none"
         >
           {profile.brand}
         </p>

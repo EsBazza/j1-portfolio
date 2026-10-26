@@ -1,14 +1,11 @@
 import { EASE, gsap, ScrollTrigger, SplitText } from "@/lib/gsap";
+import { isShown } from "./reveal";
 
 const MOTION_OK = "(prefers-reduced-motion: no-preference)";
 const FINE_POINTER = "(hover: hover) and (pointer: fine)";
 
-// Activity keeps previously visited routes in the DOM but hidden; skip them.
-const isShown = (el: Element) => el.checkVisibility?.() ?? true;
-
 /**
  * Enhances the server-rendered page under `root` through data attributes:
- * - data-reveal / data-reveal-group: fade and rise once (CSS does the motion)
  * - data-split: headings reveal line by line (SplitText)
  * - data-countup: numbers count up once
  * - data-featured-pin: featured projects pin and scrub on large screens
@@ -16,22 +13,6 @@ const isShown = (el: Element) => el.checkVisibility?.() ?? true;
  * Returns a cleanup that reverts everything.
  */
 export function initMotion(root: HTMLElement) {
-  const reveal = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        entry.target.setAttribute("data-revealed", "");
-        reveal.unobserve(entry.target);
-      }
-    },
-    { rootMargin: "0px 0px -8% 0px" },
-  );
-  root
-    .querySelectorAll(
-      "[data-reveal]:not([data-revealed]), [data-reveal-group]:not([data-revealed])",
-    )
-    .forEach((el) => isShown(el) && reveal.observe(el));
-
   const mm = gsap.matchMedia(root);
 
   mm.add(MOTION_OK, () => {
@@ -238,8 +219,5 @@ export function initMotion(root: HTMLElement) {
 
   ScrollTrigger.refresh();
 
-  return () => {
-    reveal.disconnect();
-    mm.revert();
-  };
+  return () => mm.revert();
 }
