@@ -1,26 +1,147 @@
 @import "tailwindcss";
 
+/*
+ * Theme tokens. Dark is the default; a [data-theme] attribute scopes either
+ * theme to a subtree (the root <html>, or a panel on /styleguide).
+ * Text pairs meet WCAG AA (4.5:1) on bg and surface in both themes;
+ * line-strong meets 3:1 for input borders.
+ */
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d0d0b;
+  --surface: #161614;
+  --surface-2: #1e1e1b;
+  --fg: #edebe4;
+  --muted: #a3a097;
+  --faint: #8a877e;
+  --line: #2b2a26;
+  --line-strong: #6e6b62;
+  --accent: #f2a93b;
+  --on-accent: #0d0d0b;
+  --grid-line: rgb(237 235 228 / 0.045);
+  --focus: #edebe4;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f2eb;
+  --surface: #fbfaf6;
+  --surface-2: #ece9e0;
+  --fg: #141412;
+  --muted: #5c5951;
+  --faint: #6b685f;
+  --line: #dedacf;
+  --line-strong: #8f8b80;
+  --accent: #a6560a;
+  --on-accent: #ffffff;
+  --grid-line: rgb(20 20 18 / 0.06);
+  --focus: #141412;
+}
+
+/* Motion tokens, shared with JS animation code. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --duration-fast: 200ms;
+  --duration-base: 400ms;
+  --duration-slow: 600ms;
+  --stagger: 50ms;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@theme {
+  /* One easing curve for every transition. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --default-transition-timing-function: var(--ease-out);
+  --default-transition-duration: 200ms;
+
+  --text-label: 0.75rem;
+  --text-label--line-height: 1.4;
+  --text-label--letter-spacing: 0.08em;
+  --text-hero: clamp(3rem, 8.5vw, 7.5rem);
+  --text-hero--line-height: 0.9;
+  --text-hero--letter-spacing: -0.04em;
+  --text-display: clamp(2rem, 4vw, 3rem);
+  --text-display--line-height: 1;
+  --text-display--letter-spacing: -0.03em;
+  --text-title: clamp(1.75rem, 3vw, 2.5rem);
+  --text-title--line-height: 1.05;
+  --text-title--letter-spacing: -0.025em;
+  --text-stat: 3.5rem;
+  --text-stat--line-height: 1;
+  --text-stat--letter-spacing: -0.03em;
+
+  --radius-lg: 0.625rem;
+}
+
+/* Mono label used for captions, eyebrows and stack tags. */
+@utility caption {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  letter-spacing: var(--text-label--letter-spacing);
+  text-transform: uppercase;
+}
+
+/* Faint 12-column grid lines behind a section. */
+@utility bg-grid {
+  background-image: linear-gradient(
+    to right,
+    var(--grid-line) 1px,
+    transparent 1px
+  );
+  background-size: calc(100% / 12) 100%;
+}
+
+@layer base {
+  html {
+    background-color: var(--bg);
+    color: var(--fg);
+    -webkit-text-size-adjust: 100%;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+
+  a,
+  button,
+  input,
+  label {
+    touch-action: manipulation;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--on-accent);
+  }
 }

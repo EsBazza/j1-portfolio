@@ -19,6 +19,10 @@ The source of truth for this project is the build plan:
 - The repo is public: no phone number or resume PDFs until the plan's open questions are answered.
 - No `any`. `three` stays pinned to 0.186.x to match the threejs skills.
 
+## Design system
+
+Tokens, type, motion and primitives are documented in `docs/DESIGN_SYSTEM.md`; see them rendered at `/styleguide`. Use the tokens (`bg-surface`, `text-muted`, `caption`, `text-display`…), never raw hex in components. The accent is for awards and calls to action only.
+
 ## Before calling work done
 
 ```bash
