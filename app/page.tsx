@@ -1,26 +1,52 @@
-import { ButtonLink } from "@/components/ui/Button";
-import { Container } from "@/components/ui/Container";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { hackathons } from "@/content/awards";
+import { profile } from "@/content/profile";
+import { siteUrl } from "@/lib/site";
+import { About } from "@/components/sections/About";
+import { AwardStrip } from "@/components/sections/AwardStrip";
+import { Certifications } from "@/components/sections/Certifications";
+import { Contact } from "@/components/sections/Contact";
+import { FeaturedProjects } from "@/components/sections/FeaturedProjects";
+import { Hero } from "@/components/sections/Hero";
+import { MoreProjects } from "@/components/sections/MoreProjects";
+import { Skills } from "@/components/sections/Skills";
+import { Timeline } from "@/components/sections/Timeline";
 
-// Placeholder until Phase 4 builds the real home page.
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: profile.name,
+  jobTitle: profile.role,
+  url: siteUrl,
+  email: `mailto:${profile.email}`,
+  sameAs: [profile.links.github.href, profile.links.linkedin.href],
+  alumniOf: {
+    "@type": "CollegeOrUniversity",
+    name: profile.education.school,
+  },
+  knowsLanguage: profile.languages,
+  award: hackathons
+    .filter((h) => h.rank)
+    .map((h) => `${h.result} — ${h.event}`),
+};
+
 export default function Home() {
   return (
-    <main className="min-h-dvh bg-grid">
-      <Container className="flex min-h-dvh flex-col justify-center gap-6 py-24">
-        <p className="caption text-faint">Build log · under construction</p>
-        <h1 className="max-w-[11ch] font-display text-hero font-bold text-balance">
-          Amaro Juno D. Alonzo
-        </h1>
-        <p className="font-display text-2xl font-semibold">
-          Full-Stack &amp; AI Developer
-        </p>
-        <div className="flex flex-wrap items-center gap-3">
-          <ButtonLink href="https://github.com/EsBazza">
-            GitHub <span aria-hidden="true">↗</span>
-          </ButtonLink>
-          <ThemeToggle />
-        </div>
-      </Container>
-    </main>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(personJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      <Hero />
+      <AwardStrip />
+      <FeaturedProjects />
+      <MoreProjects />
+      <Timeline />
+      <Skills />
+      <About />
+      <Certifications />
+      <Contact />
+    </>
   );
 }

@@ -32,7 +32,7 @@ const typeScale = [
   {
     name: "hero",
     className: "font-display text-hero font-bold text-balance",
-    sample: "Amaro Alonzo",
+    sample: "Juno Alonzo",
   },
   {
     name: "display",
@@ -62,7 +62,7 @@ const typeScale = [
   {
     name: "caption",
     className: "caption text-faint",
-    sample: "Project 01 · RAITE 2026 Champion",
+    sample: "Project 01 · Hackathon Winner · RAITE 2026",
   },
 ] as const;
 
@@ -244,7 +244,7 @@ function ThemePanel({ theme }: { theme: Theme }) {
           <Group title="Card + browser frame">
             <Card className="max-w-xl">
               <BrowserFrame
-                url="patun-ai.vercel.app"
+                url="proctor-ai-sigma.vercel.app"
                 className="rounded-none border-0 border-b"
               >
                 <div className="flex aspect-video items-center justify-center caption text-faint">
@@ -253,7 +253,7 @@ function ThemePanel({ theme }: { theme: Theme }) {
               </BrowserFrame>
               <CardBody>
                 <p className="caption text-accent">
-                  Project 01 · RAITE 2026 Champion
+                  Project 01 · Hackathon Winner · RAITE 2026
                 </p>
                 <h4 className="font-display text-title font-bold">
                   Proctor.AI
