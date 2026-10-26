@@ -1,0 +1,13 @@
+## The problem
+
+RAITE 2026, PSITE Region III's regional IT competition, needed one place for coaches to register schools and competitors and for teams to submit large media entries, under heavy registration spikes.
+
+## What we built
+
+- **Event registration for coaches and competitors**, with bulk Excel and CSV competitor imports.
+- **Large uploads of up to 1.2 GB** for competition media entries, routed through a dedicated upload handler so big transfers don't exhaust memory.
+- **Production hosting on a VPS:** Nginx as the reverse proxy, PM2 to run the app, Let's Encrypt for TLS and Cloudflare for DNS.
+
+## How it works
+
+The Next.js app uses Clerk for sign-in, Supabase PostgreSQL through Prisma with PgBouncer pooling for concurrent registrations, and Upstash Redis for rate limiting. Long-running bulk imports get extended transaction timeouts so large CSV files finish in one go.

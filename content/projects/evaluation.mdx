@@ -1,0 +1,16 @@
+## The problem
+
+Faculty evaluations only work if students trust that their answers stay anonymous, and if each department can see its own results without seeing everyone else's.
+
+## What I built
+
+A university-wide evaluation platform for the University of the Assumption that collects, processes and analyses student evaluations of faculty:
+
+- **UA Google sign-in and scoped roles.** System administrators manage the whole platform; department sub-administrators only see their own department, across junior high, senior high, college and graduate school.
+- **Anonymous, encrypted responses.** Evaluations are stored as AES-GCM encrypted bytes, and an HMAC of the student's identity blocks duplicate submissions without linking a student to their answers. Audit logs are encrypted with AES-256-GCM.
+- **Faculty analytics.** Composite scores, cluster averages, radar, bar and trend charts, plus Gemini-written narrative summaries of the written feedback.
+- **Exports.** Multi-page PDF reports of the dashboards and CSV exports of the ratings, attendance and audit tables.
+
+## How it works
+
+The Next.js App Router app uses NextAuth for Google OAuth and admin sign-in, Prisma over PostgreSQL for departments, templates, sections and evaluations, and server actions for mutations. Encryption happens before anything is written, so the database only ever holds ciphertext for responses.

@@ -1,0 +1,20 @@
+## The problem
+
+Festivals leave tonnes of paper, bamboo, fabric and flowers behind, and most of it ends up in landfill. The material has no record, the artisans who could use it can't find it, and buyers who want to support upcycled goods have no way to check the claim.
+
+## What we built
+
+HeriTech connects the three people who can fix this, built for EduTech Asia 2026's Planet Protectors Challenge:
+
+- **Local government officers** log and classify what they collect, and receive 25% of every sale made from it.
+- **Artisans** find free, classified material on a map, pick it up safely, and receive 70% of every sale.
+- **Buyers** get a **Verified Impact Pass**: a public, scannable record of the material, the maker and the money, saved to Google Wallet. The remaining 5% goes to charity and app upkeep.
+
+## How it works
+
+1. **Collect and classify.** An officer photographs the material and Gemini names it, rates its condition and flags contamination. If Gemini can't be reached, an on-device Teachable Machine model gives a labelled estimate.
+2. **Reserve and hand over.** An artisan reserves a batch on the material map. At pickup they show an HMAC-signed QR code valid for 30 minutes, and the officer scans it to transfer custody.
+3. **Craft and list.** The artisan lists the finished piece, linked to its batch. Gemini drafts a product story, and Cloud Translation shows the shop in the buyer's language.
+4. **Buy and verify.** Checkout shows the 70 / 25 / 5 split, and the pass's QR code opens the piece's public record for anyone who scans it.
+
+The browser never touches the database directly: every request goes through an API route that verifies the Firebase ID token and the caller's role. Reservations, handovers and stock run in Firestore transactions, and the split maths, tokens and record integrity are covered by 61 Vitest unit tests.

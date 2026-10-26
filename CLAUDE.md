@@ -1,10 +1,18 @@
 @AGENTS.md
 
-# Amaro Alonzo — portfolio
+# Juno Alonzo — portfolio
+
+Amaro Juno D. Alonzo goes by **Juno Alonzo**: use that as the short name everywhere (header, footer, titles, OG images); keep the full name only where a full name belongs (hero, resume).
 
 The source of truth for this project is the build plan:
 
 @docs/PORTFOLIO_BUILD_PLAN.md
+
+## Corrections from Juno (override the plan)
+
+- **RAITE 2026:** Juno won the RAITE 2026 **Hackathon** (Proctor.AI, plus Best Technical Implementation and Best User Experience). "Overall Champion" was the University of the Assumption's title, not his. Never call him Overall Champion.
+- **RAITE 2024:** joined, no award. **RAITE 2025:** did not join.
+- **Proctor.AI live site:** https://proctor-ai-sigma.vercel.app (not patun-ai.vercel.app).
 
 ## Working rules
 

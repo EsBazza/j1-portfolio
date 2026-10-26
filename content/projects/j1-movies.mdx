@@ -1,0 +1,16 @@
+## The problem
+
+Finding something to watch means jumping between search, ratings, cast pages and a watchlist that lives somewhere else.
+
+## What I built
+
+A personal movie and TV discovery site with TMDB data:
+
+- **Trending, popular and top-rated** movies and series, plus actor and director filmographies.
+- **Discovery filters** for release year, minimum rating, language and genre, and instant search with keyboard suggestions (press `/`).
+- **A watchlist and collections** saved in the browser, with one-click JSON backup and restore to move them between devices.
+- **Playback through third-party embedded streams** with resume and next-episode. No video is stored or hosted by the site.
+
+## How it works
+
+The Next.js App Router app talks to TMDB only through a server-side `/api/tmdb` proxy, so the API key never reaches the browser. Library state uses React's `useSyncExternalStore` over `localStorage`, with no database.

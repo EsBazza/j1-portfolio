@@ -1,0 +1,14 @@
+## The problem
+
+Checking a public infrastructure project means piecing together the official record, the contractor behind it and what is actually on the ground. MapaTunAI puts all three on one map.
+
+## What we built
+
+- **A national map of DPWH infrastructure projects**, seeded with PSA regions and provinces and drawn with Mapbox GL.
+- **Contractor records, citizen reports and satellite history** attached to each project.
+- **An AI audit:** Gemini cross-checks project records, satellite images and citizen reports to flag irregularities.
+- **A 26-endpoint API** that serves the map, the records and the audit.
+
+## How it works
+
+Project, contractor and report data lives in PostgreSQL on Supabase, accessed through Prisma. The Next.js app renders the map with Mapbox GL and calls Gemini to run the audit on a project's records, imagery and reports.

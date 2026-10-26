@@ -1,0 +1,18 @@
+## The problem
+
+Sometimes a line from a film says it better. Reel To You turns a movie quote into a message left for someone, that anyone can find by their name.
+
+## What I built
+
+A mobile-first time capsule with no accounts:
+
+1. Search for a movie with TMDB.
+2. Pick a curated quote, or write your own.
+3. Add a short dedication and the recipient's name.
+4. Submit, and get a direct link to share.
+
+Anyone can type a name and read every message left for it, newest first.
+
+## How it works
+
+Entries live in Supabase Postgres, where the public can only read visible entries and every write goes through a server route. Upstash Redis rate-limits submissions, and names are normalised so searches match however they were typed.

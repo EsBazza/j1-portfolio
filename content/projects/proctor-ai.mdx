@@ -1,0 +1,19 @@
+## The problem
+
+When every student gets the same exam, answers can travel. PatunAI (from the Tagalog _patunay_, proof) starts from a different idea: _every student gets a different exam, and every exam measures the same thing._
+
+## What we built
+
+- **Equivalent exams for every student.** Gemini generates question variants that test the same learning objectives at the same Bloom's Taxonomy level, so no two students get an identical test.
+- **10-second multi-frame forensics.** A 1 fps ring buffer keeps the five seconds before an infraction, the trigger frame and the five seconds after, alongside keystrokes. Gemini Vision rates each clip as critical, suspicious, low or benign, and teachers review it in a filmstrip inspector.
+- **Two-strike lockout.** The first strike warns the student. The second locks the exam, freezing the timer and questions while keeping answers. A teacher can unlock it in one click.
+- **Google Classroom integration.** Rosters sync automatically, each student gets a private, personalised assignment with their own access link, and deleting an exam cleans up the posted coursework.
+- **Seven question formats** (multiple choice, true or false, short answer, essay, fill in the blank, matching, identification), 1 to 100 questions per student, generated in English, Tagalog or Bisaya.
+- **AI grading and cohort analytics** with step-by-step rubrics and a summary of class-wide gaps.
+
+## How it works
+
+1. The teacher uploads PDFs, scanned images or lecture notes. Gemini parses them, and they stay in a saved materials library for reuse.
+2. Gemini generates an equivalent exam per student, and the platform publishes each one to Google Classroom.
+3. Students take the exam in a quiet, print-like exam view while the forensic buffer runs in the background.
+4. Flagged clips go to the teacher for review; finished exams are graded with AI rubrics and summarised for the whole class.
