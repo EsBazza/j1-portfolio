@@ -9,6 +9,7 @@ import { FeaturedProjects } from "@/components/sections/FeaturedProjects";
 import { Hero } from "@/components/sections/Hero";
 import { MoreProjects } from "@/components/sections/MoreProjects";
 import { Skills } from "@/components/sections/Skills";
+import { StackMarquee } from "@/components/sections/StackMarquee";
 import { Timeline } from "@/components/sections/Timeline";
 
 const personJsonLd = {
@@ -40,6 +41,7 @@ export default function Home() {
       />
       <Hero />
       <AwardStrip />
+      <StackMarquee />
       <FeaturedProjects />
       <MoreProjects />
       <Timeline />

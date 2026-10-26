@@ -66,6 +66,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
+        <div aria-hidden="true" className="scroll-progress print:hidden" />
         <Header />
         <main id="main" tabIndex={-1} className="flex-1 outline-none">
           {children}

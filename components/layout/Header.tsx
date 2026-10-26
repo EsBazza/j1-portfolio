@@ -20,7 +20,7 @@ export function Header() {
           href="/"
           className="mr-auto inline-flex min-h-11 items-center caption font-medium text-fg"
         >
-          {profile.shortName}
+          {profile.name}
         </Link>
 
         <ul className="hidden items-center gap-6 lg:flex">
@@ -42,7 +42,7 @@ export function Header() {
           <ButtonLink
             href="/resume"
             variant="secondary"
-            className="hidden sm:inline-flex"
+            className="max-sm:hidden"
           >
             Resume
           </ButtonLink>

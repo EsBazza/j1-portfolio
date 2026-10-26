@@ -33,7 +33,11 @@ export function SectionHeading({
 }) {
   return (
     <div className={cn("flex flex-col gap-4", className)}>
-      {eyebrow ? <p className="caption text-faint">{eyebrow}</p> : null}
+      {eyebrow ? (
+        <p data-scramble className="caption text-faint">
+          {eyebrow}
+        </p>
+      ) : null}
       <h2
         id={id}
         data-split

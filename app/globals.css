@@ -282,3 +282,139 @@
     animation-delay: 0s !important;
   }
 }
+
+/* Hero intro: letters rise out of a mask, then the rest fades up. Pure CSS,
+   so it runs without JavaScript and starts before hydration. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-char {
+    animation: hero-rise var(--duration-slow) var(--ease-out) both;
+    animation-delay: calc(80ms + var(--i, 0) * 45ms);
+  }
+
+  .hero-intro {
+    animation: hero-fade var(--duration-slow) var(--ease-out) both;
+    animation-delay: calc(360ms + var(--intro, 0) * 70ms);
+  }
+}
+
+@keyframes hero-rise {
+  from {
+    transform: translateY(105%);
+  }
+}
+
+@keyframes hero-fade {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* Reading progress under the header (scroll-driven, no JavaScript). */
+.scroll-progress {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 60;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  pointer-events: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .scroll-progress {
+      animation: scroll-progress linear both;
+      animation-timeline: scroll(root);
+    }
+  }
+}
+
+@keyframes scroll-progress {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Tech marquee. */
+.marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+}
+
+.marquee ul {
+  display: flex;
+  gap: 3rem;
+  padding-right: 3rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  letter-spacing: var(--text-label--letter-spacing);
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.marquee li::before {
+  content: "▸";
+  margin-right: 0.75rem;
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .marquee-track {
+    animation: marquee 45s linear infinite;
+  }
+
+  .marquee:hover .marquee-track,
+  .marquee:focus-within .marquee-track {
+    animation-play-state: paused;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    mask-image: none;
+  }
+
+  .marquee-track,
+  .marquee ul {
+    width: auto;
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 0.75rem;
+    white-space: normal;
+  }
+
+  .marquee-copy {
+    display: none;
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* 3D hero: the canvas fades in over the static sphere once it renders. */
+[data-static-fallback],
+.scene-fade {
+  transition: opacity var(--duration-slow) var(--ease-out);
+}
+
+[data-hero-backdrop]:not([data-3d-ready]) .scene-fade,
+[data-3d-ready] [data-static-fallback] {
+  opacity: 0;
+}

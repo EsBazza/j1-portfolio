@@ -27,25 +27,27 @@ export function MoreProjects() {
           className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
         >
           {moreProjects.map((project) => (
-            <li
-              key={project.slug}
-              data-spotlight
-              className="group relative flex flex-col gap-3 overflow-hidden rounded-lg border border-line bg-surface p-6 hover:border-line-strong"
-            >
-              <p className="caption text-faint">
-                {String(project.order).padStart(2, "0")} ·{" "}
-                {project.tags.map((t) => tagLabels[t]).join(" · ")}
-              </p>
-              <h3 className="font-display text-xl font-semibold">
-                <Link
-                  href={`/projects/${project.slug}`}
-                  className="after:absolute after:inset-0"
-                >
-                  {project.title}
-                </Link>
-              </h3>
-              <p className="text-[0.9375rem] text-muted">{project.tagline}</p>
-              <ArrowRight className="mt-auto text-faint transition-transform group-hover:translate-x-1 motion-reduce:transition-none" />
+            <li key={project.slug} className="flex">
+              <div
+                data-spotlight
+                data-tilt
+                className="group relative flex w-full flex-col gap-3 overflow-hidden rounded-lg border border-line bg-surface p-6 hover:border-line-strong"
+              >
+                <p className="caption text-faint">
+                  {String(project.order).padStart(2, "0")} ·{" "}
+                  {project.tags.map((t) => tagLabels[t]).join(" · ")}
+                </p>
+                <h3 className="font-display text-xl font-semibold">
+                  <Link
+                    href={`/projects/${project.slug}`}
+                    className="after:absolute after:inset-0"
+                  >
+                    {project.title}
+                  </Link>
+                </h3>
+                <p className="text-[0.9375rem] text-muted">{project.tagline}</p>
+                <ArrowRight className="mt-auto text-faint transition-transform group-hover:translate-x-1 motion-reduce:transition-none" />
+              </div>
             </li>
           ))}
         </ul>

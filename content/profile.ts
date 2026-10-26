@@ -5,9 +5,13 @@ import { profileSchema } from "./schema";
 export const profile = profileSchema.parse({
   name: "Amaro Juno D. Alonzo",
   shortName: "Juno Alonzo",
+  brand: "J1 Dev",
   role: "Full-Stack & AI Developer",
   pitch:
     "I build and ship full-stack web apps with Next.js, TypeScript, PostgreSQL and the Gemini API.",
+  intro:
+    "I build AI-powered web apps that ship, and win hackathons: an exam platform where every student gets a different test, a map that checks public works against satellite imagery, and a marketplace that turns festival waste into traceable craft.",
+  coreStack: ["Next.js", "TypeScript", "PostgreSQL", "Gemini"],
   location: "Candaba, Pampanga, Philippines",
   email: "alonzoamarojuno@gmail.com",
   links: {

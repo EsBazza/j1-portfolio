@@ -74,6 +74,59 @@ export function initMotion(root: HTMLElement) {
         scrollTrigger: { trigger: el, start: "top 92%", once: true },
       });
     });
+    // Captions decode like a terminal line when they scroll in.
+    root.querySelectorAll<HTMLElement>("[data-scramble]").forEach((el) => {
+      if (!isShown(el)) return;
+      const text = el.textContent ?? "";
+      gsap.to(el, {
+        duration: 0.6,
+        ease: "none",
+        scrambleText: { text, chars: "01<>/_#", speed: 0.6 },
+        scrollTrigger: { trigger: el, start: "top 90%", once: true },
+      });
+    });
+
+    // The hackathon log's accent line draws down as you scroll through it.
+    root
+      .querySelectorAll<HTMLElement>("[data-timeline]")
+      .forEach((timeline) => {
+        const line = timeline.querySelector("[data-timeline-progress]");
+        if (!line || !isShown(timeline)) return;
+        gsap.fromTo(
+          line,
+          { scaleY: 0 },
+          {
+            scaleY: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: timeline,
+              start: "top 70%",
+              end: "bottom 60%",
+              scrub: 0.4,
+            },
+          },
+        );
+      });
+
+    // Big wordmarks reveal letter by letter.
+    document
+      .querySelectorAll<HTMLElement>("[data-split-chars]")
+      .forEach((el) => {
+        if (!isShown(el)) return;
+        SplitText.create(el, {
+          type: "chars",
+          mask: "chars",
+          onSplit: (self) =>
+            gsap.from(self.chars, {
+              yPercent: 100,
+              duration: 0.6,
+              ease: EASE,
+              stagger: 0.05,
+              scrollTrigger: { trigger: el, start: "top 95%", once: true },
+            }),
+        });
+      });
+
     // Reverting mid-way (route change, preference change) must not leave a 0.
     return () => restore.forEach((fn) => fn());
   });
@@ -149,7 +202,38 @@ export function initMotion(root: HTMLElement) {
           el.removeEventListener("pointerleave", leave);
         };
       });
-    return () => cleanups.forEach((fn) => fn());
+
+    // Cards tilt toward the cursor in 3D.
+    const tilts = [...root.querySelectorAll<HTMLElement>("[data-tilt]")]
+      .filter(isShown)
+      .map((el) => {
+        gsap.set(el, { transformPerspective: 900 });
+        const toX = gsap.quickTo(el, "rotationX", {
+          duration: 0.5,
+          ease: EASE,
+        });
+        const toY = gsap.quickTo(el, "rotationY", {
+          duration: 0.5,
+          ease: EASE,
+        });
+        const move = (e: PointerEvent) => {
+          const r = el.getBoundingClientRect();
+          toY(((e.clientX - r.left) / r.width - 0.5) * 8);
+          toX(-((e.clientY - r.top) / r.height - 0.5) * 8);
+        };
+        const leave = () => {
+          toX(0);
+          toY(0);
+        };
+        el.addEventListener("pointermove", move);
+        el.addEventListener("pointerleave", leave);
+        return () => {
+          el.removeEventListener("pointermove", move);
+          el.removeEventListener("pointerleave", leave);
+        };
+      });
+
+    return () => [...cleanups, ...tilts].forEach((fn) => fn());
   });
 
   ScrollTrigger.refresh();

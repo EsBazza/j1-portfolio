@@ -17,10 +17,19 @@ export function Footer() {
   ];
 
   return (
-    <footer className="border-t border-line print:hidden">
+    <footer className="overflow-hidden border-t border-line print:hidden">
+      {/* Giant wordmark; the motion layer reveals it letter by letter. */}
+      <Container aria-hidden="true" className="pt-12">
+        <p
+          data-split-chars
+          className="font-display text-[clamp(5rem,24vw,22rem)] leading-[0.8] font-bold tracking-[-0.06em] text-surface-2 select-none"
+        >
+          {profile.brand}
+        </p>
+      </Container>
       <Container className="flex flex-col gap-8 py-12 md:flex-row md:items-end md:justify-between">
         <div className="flex flex-col gap-3">
-          <p className="font-display text-2xl font-bold">{profile.shortName}</p>
+          <p className="font-display text-2xl font-bold">{profile.name}</p>
           <p className="caption text-faint">
             Built with {builtWith.join(" · ")}
           </p>

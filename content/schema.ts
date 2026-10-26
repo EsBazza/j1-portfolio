@@ -52,8 +52,14 @@ export const linkSchema = z.object({
 export const profileSchema = z.object({
   name: z.string().min(1),
   shortName: z.string().min(1),
+  /** Personal brand shown as the hero title. */
+  brand: z.string().min(1),
   role: z.string().min(1),
   pitch: z.string().min(1),
+  /** The hero's longer introduction. */
+  intro: z.string().min(1),
+  /** Core stack shown under the hero introduction. */
+  coreStack: z.array(z.string().min(1)).min(1),
   location: z.string().min(1),
   email: z.email(),
   links: z.object({ github: linkSchema, linkedin: linkSchema }),

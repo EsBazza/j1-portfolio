@@ -14,6 +14,7 @@ export function ProjectCard({
   return (
     <article
       data-spotlight
+      data-tilt
       className="group relative flex h-full flex-col gap-5 overflow-hidden rounded-xl border border-line bg-surface p-3 hover:border-line-strong"
     >
       <ProjectCover
