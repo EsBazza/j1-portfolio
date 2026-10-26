@@ -22,7 +22,10 @@ export function About() {
           </p>
         </div>
 
-        <dl className="grid gap-px self-start overflow-hidden rounded-lg border border-line bg-line lg:col-span-6">
+        <dl
+          data-reveal
+          className="grid gap-px self-start overflow-hidden rounded-lg border border-line bg-line lg:col-span-6"
+        >
           <div className="flex flex-col gap-1.5 bg-surface p-6">
             <dt className="caption text-faint">Education</dt>
             <dd className="font-display text-xl font-semibold">

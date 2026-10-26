@@ -25,8 +25,26 @@ export function FeaturedProjects() {
           Built, shipped and judged.
         </SectionHeading>
       </Container>
-      <Container className="py-16 md:py-24">
-        <ol className="flex flex-col gap-20 md:gap-28">
+      {/* On large screens the motion layer pins this block (data-pinned) and
+          scrubs between the panels; otherwise it is a vertical stack. */}
+      <Container
+        data-featured-pin
+        data-reveal
+        className="py-16 data-pinned:flex data-pinned:min-h-svh data-pinned:flex-col data-pinned:justify-center data-pinned:gap-8 data-pinned:py-10 md:py-24"
+      >
+        <div
+          aria-hidden="true"
+          className="hidden items-center gap-2 [[data-pinned]_&]:flex"
+        >
+          {featuredProjects.map((p) => (
+            <span
+              key={p.slug}
+              data-panel-index
+              className="h-0.5 w-10 bg-line-strong data-active:bg-accent"
+            />
+          ))}
+        </div>
+        <ol className="flex flex-col gap-20 md:gap-28 [[data-pinned]_&]:grid [[data-pinned]_&]:gap-0">
           {featuredProjects.map((project, i) => (
             <FeaturedPanel key={project.slug} project={project} index={i} />
           ))}
@@ -47,12 +65,13 @@ function FeaturedPanel({
     <li
       data-panel
       id={`featured-${project.slug}`}
-      className="grid scroll-mt-24 items-center gap-8 lg:grid-cols-12 lg:gap-12"
+      className="grid scroll-mt-24 items-center gap-8 lg:grid-cols-12 lg:gap-12 [[data-pinned]_&]:[grid-area:1/1]"
     >
       <ProjectCover
         project={project}
         sizes="(min-width: 1024px) 58vw, 100vw"
         preload={index === 0}
+        morph
         className="lg:col-span-7"
       />
       <div className="flex flex-col gap-4 lg:col-span-5">

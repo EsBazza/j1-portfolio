@@ -17,8 +17,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/resume" },
 };
 
-// The PDFs carry a phone number, so they stay out of the public repo until
-// Juno adds them. The buttons appear only for files that exist.
+// Juno's own resume PDFs; a button appears for each file that exists.
 const pdfs = [
   { label: "Classic PDF", file: "Amaro_Alonzo_Resume_Classic.pdf" },
   { label: "Modern PDF", file: "Amaro_Alonzo_Resume_Modern.pdf" },

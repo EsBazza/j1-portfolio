@@ -65,7 +65,10 @@ export function Contact() {
             </li>
           </ul>
         </div>
-        <div className="rounded-lg border border-line bg-surface p-6 sm:p-8 lg:col-span-7">
+        <div
+          data-reveal
+          className="rounded-lg border border-line bg-surface p-6 sm:p-8 lg:col-span-7"
+        >
           <ContactForm />
         </div>
       </div>

@@ -20,6 +20,7 @@ export function ProjectCard({
         project={project}
         sizes="(min-width: 1280px) 400px, (min-width: 768px) 50vw, 100vw"
         preload={preload}
+        morph
         className="rounded-lg"
       />
       <div className="flex flex-1 flex-col gap-2.5 px-3 pb-3">

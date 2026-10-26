@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { photos } from "./photos";
 import { hackathonSchema } from "./schema";
 
 // Sources: the build plan, the resume, project READMEs, and Juno (RAITE 2024:
@@ -20,11 +21,13 @@ export const hackathons = z.array(hackathonSchema).parse([
   {
     event: "RAITE 2026",
     year: 2026,
+    location: "Pampanga State University",
     result:
       "Hackathon winner · Best Technical Implementation · Best User Experience",
     rank: { prefix: "#", value: 1 },
     project: "proctor-ai",
     highlight: true,
+    photo: photos.raiteHackathon,
   },
   {
     event: "Philippine Startup Challenge XI",
@@ -37,9 +40,11 @@ export const hackathons = z.array(hackathonSchema).parse([
   {
     event: "Can You HackIT: The IBPAP Challenge",
     year: 2026,
+    location: "Clark",
     result: "Top 3",
     rank: { prefix: "Top ", value: 3 },
     project: "mapatunai",
+    photo: photos.canYouHackIt,
   },
   {
     event: "EduTech Asia 2026 · Planet Protectors Challenge",

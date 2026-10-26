@@ -5,6 +5,7 @@ import { siteUrl } from "@/lib/site";
 import { THEME_COLORS, themeScript } from "@/lib/theme";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { MotionLayer } from "@/components/motion/MotionLayer";
 import "./globals.css";
 
 const display = Bricolage_Grotesque({
@@ -70,6 +71,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
         <Footer />
+        <MotionLayer />
       </body>
     </html>
   );

@@ -15,7 +15,10 @@ export function Certifications() {
         <SectionHeading id="certifications-title" eyebrow="Certifications">
           {issuers.slice(0, -1).join(", ")} and {issuers.at(-1)}.
         </SectionHeading>
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul
+          data-reveal-group
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        >
           {certifications.map((cert) => (
             <li
               key={`${cert.issuer}-${cert.title}`}

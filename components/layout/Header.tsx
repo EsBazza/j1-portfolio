@@ -10,11 +10,11 @@ export function Header() {
   return (
     <header
       data-site-header
-      className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur-md print:hidden"
+      className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur-md transition-transform duration-200 motion-reduce:transition-none print:hidden [[data-scrolled]_&]:-translate-y-1.5"
     >
       <nav
         aria-label="Primary"
-        className="mx-auto flex w-full max-w-7xl items-center gap-6 px-4 py-3 md:px-8 xl:px-20 [[data-scrolled]_&]:py-1.5"
+        className="mx-auto flex w-full max-w-7xl items-center gap-6 px-4 py-3 md:px-8 xl:px-20"
       >
         <Link
           href="/"
@@ -29,7 +29,7 @@ export function Header() {
               <a
                 href={`/#${s.id}`}
                 data-nav-link={s.id}
-                className="inline-flex min-h-11 items-center border-b border-transparent caption text-muted hover:text-fg aria-[current=true]:border-accent aria-[current=true]:text-fg"
+                className="inline-flex min-h-11 items-center border-b border-transparent caption text-muted hover:text-fg aria-[current=location]:border-accent aria-[current=location]:text-fg"
               >
                 {s.label}
               </a>

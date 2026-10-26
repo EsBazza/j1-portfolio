@@ -37,6 +37,8 @@ export const projectSchema = z.object({
   live: z.url().optional(),
   cover: imageSchema.optional(),
   screenshots: z.array(imageSchema).default([]),
+  /** Photos from the event the project was built or recognised at. */
+  photos: z.array(imageSchema).default([]),
   /** Juno's role; shown as a TODO until filled in. */
   role: z.string().optional(),
   year: z.number().int().optional(),
@@ -81,6 +83,7 @@ export const hackathonSchema = z.object({
     .optional(),
   project: z.string().optional(),
   highlight: z.boolean().default(false),
+  photo: imageSchema.optional(),
 });
 
 export const skillGroupSchema = z.object({

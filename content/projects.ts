@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { photos } from "./photos";
 import { projectSchema, type Project, type ProjectTag } from "./schema";
 
 // Sources: the build plan's Projects table, the resume, and each repo's README.
@@ -8,6 +9,7 @@ export const projects: Project[] = z
   .parse([
     {
       slug: "proctor-ai",
+      photos: [photos.raiteHackathon],
       title: "Proctor.AI",
       aka: "PatunAI",
       tagline:
@@ -52,6 +54,7 @@ export const projects: Project[] = z
     },
     {
       slug: "mapatunai",
+      photos: [photos.canYouHackIt],
       title: "MapaTunAI",
       tagline: "Public infrastructure transparency map with an AI audit.",
       summary:
@@ -156,6 +159,7 @@ export const projects: Project[] = z
     },
     {
       slug: "raite-registration",
+      photos: [photos.raiteRegistration],
       title: "RAITE 2026 Registration Platform",
       tagline: "Registration site for PSITE Region III's RAITE 2026.",
       summary:

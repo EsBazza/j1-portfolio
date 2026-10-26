@@ -12,7 +12,10 @@ export function Skills() {
         <SectionHeading id="skills-title" eyebrow="Skills">
           What I build with.
         </SectionHeading>
-        <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div
+          data-reveal-group
+          className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4"
+        >
           {skills.map((group) => (
             <div key={group.name} className="flex flex-col gap-4">
               <h3 className="border-b border-line pb-3 caption text-faint">

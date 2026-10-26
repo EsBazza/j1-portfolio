@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ViewTransition } from "react";
 import type { Project } from "@/content/schema";
 import { BrowserFrame } from "@/components/ui/BrowserFrame";
 
@@ -10,20 +11,24 @@ function frameUrl(project: Project) {
 
 /**
  * A project's cover in browser chrome: the real screenshot when there is one,
- * otherwise a typographic card (never a stock image).
+ * otherwise a typographic card (never a stock image). With `morph`, the cover
+ * is a shared view-transition element that morphs between the project lists
+ * and the case study.
  */
 export function ProjectCover({
   project,
   sizes,
   preload = false,
+  morph = false,
   className,
 }: {
   project: Project;
   sizes: string;
   preload?: boolean;
+  morph?: boolean;
   className?: string;
 }) {
-  return (
+  const frame = (
     <BrowserFrame url={frameUrl(project)} className={className}>
       {project.cover ? (
         <Image
@@ -52,5 +57,16 @@ export function ProjectCover({
         </div>
       )}
     </BrowserFrame>
+  );
+
+  if (!morph) return frame;
+  return (
+    <ViewTransition
+      name={`project-cover-${project.slug}`}
+      share="morph"
+      default="none"
+    >
+      {frame}
+    </ViewTransition>
   );
 }

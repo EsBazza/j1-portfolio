@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ViewTransition } from "react";
 import {
   isProjectFilter,
   projectFilters,
@@ -54,6 +55,7 @@ function ProjectIndex({ filter }: { filter: ProjectFilter }) {
                     f.value === "all" ? "/projects" : `/projects?tag=${f.value}`
                   }
                   scroll={false}
+                  transitionTypes={["filter"]}
                   aria-current={active ? "page" : undefined}
                   className={cn(
                     "inline-flex min-h-11 items-center rounded-full border px-4 caption",
@@ -75,9 +77,18 @@ function ProjectIndex({ filter }: { filter: ProjectFilter }) {
 
       <ul className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {shown.map((project, i) => (
-          <li key={project.slug}>
-            <ProjectCard project={project} preload={i < 2} />
-          </li>
+          // List identity: cards fade in/out and glide when the filter changes.
+          <ViewTransition
+            key={project.slug}
+            enter={{ filter: "filter-in", default: "none" }}
+            exit={{ filter: "filter-out", default: "none" }}
+            update={{ filter: "filter-move", default: "none" }}
+            default="none"
+          >
+            <li>
+              <ProjectCard project={project} preload={i < 2} />
+            </li>
+          </ViewTransition>
         ))}
       </ul>
     </>

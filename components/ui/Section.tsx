@@ -34,7 +34,11 @@ export function SectionHeading({
   return (
     <div className={cn("flex flex-col gap-4", className)}>
       {eyebrow ? <p className="caption text-faint">{eyebrow}</p> : null}
-      <h2 id={id} className="font-display text-display font-bold text-balance">
+      <h2
+        id={id}
+        data-split
+        className="font-display text-display font-bold text-balance"
+      >
         {children}
       </h2>
     </div>

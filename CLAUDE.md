@@ -24,7 +24,7 @@ The source of truth for this project is the build plan:
 - Register GSAP plugins once in `lib/gsap.ts`; create animations inside `useGSAP()`.
 - Animate only `transform` and `opacity`; every animation has a `prefers-reduced-motion` fallback; content is visible without JavaScript.
 - Secrets (e.g. the Resend key) live only in server code and Vercel env vars, never `NEXT_PUBLIC_`.
-- The repo is public: no phone number or resume PDFs until the plan's open questions are answered.
+- `public/resume/*.pdf` are Juno's own resume files, published as-is at his request (they still say "Overall Champion" and show his phone number; he knows). Don't edit or remove them without asking. The site itself shows no phone number.
 - No `any`. `three` stays pinned to 0.186.x to match the threejs skills.
 
 ## Design system

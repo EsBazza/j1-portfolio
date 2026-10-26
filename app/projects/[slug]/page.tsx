@@ -68,6 +68,7 @@ export default async function CaseStudyPage({
           project={project}
           sizes="(min-width: 1280px) 1120px, 100vw"
           preload
+          morph
         />
       </Container>
 
@@ -159,7 +160,7 @@ export default async function CaseStudyPage({
       {project.screenshots.length > 0 ? (
         <Container className="mt-20 flex flex-col gap-8">
           <h2 className="font-display text-title font-bold">Screenshots</h2>
-          <ul className="grid gap-6 md:grid-cols-2">
+          <ul data-reveal-group className="grid gap-6 md:grid-cols-2">
             {project.screenshots.map((shot) => (
               <li key={shot.src}>
                 <figure className="flex flex-col gap-3">
@@ -175,6 +176,31 @@ export default async function CaseStudyPage({
                   </BrowserFrame>
                   <figcaption className="text-sm text-muted">
                     {shot.alt}
+                  </figcaption>
+                </figure>
+              </li>
+            ))}
+          </ul>
+        </Container>
+      ) : null}
+
+      {project.photos.length > 0 ? (
+        <Container className="mt-20 flex flex-col gap-8">
+          <h2 className="font-display text-title font-bold">From the event</h2>
+          <ul data-reveal-group className="grid gap-6 md:grid-cols-2">
+            {project.photos.map((photo) => (
+              <li key={photo.src}>
+                <figure className="flex flex-col gap-3">
+                  <Image
+                    src={photo.src}
+                    alt={photo.alt}
+                    width={photo.width}
+                    height={photo.height}
+                    sizes="(min-width: 768px) 50vw, 100vw"
+                    className="h-auto max-h-[36rem] w-full rounded-lg border border-line bg-surface object-contain"
+                  />
+                  <figcaption className="text-sm text-muted">
+                    {photo.alt}
                   </figcaption>
                 </figure>
               </li>

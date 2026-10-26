@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { hackathons } from "@/content/awards";
 import { getProject } from "@/content/projects";
@@ -18,7 +19,10 @@ export function Timeline() {
         >
           Hackathon log.
         </SectionHeading>
-        <ol className="flex flex-col border-l border-line lg:col-span-8">
+        <ol
+          data-reveal-group
+          className="flex flex-col border-l border-line lg:col-span-8"
+        >
           {hackathons.map((h) => {
             const project = h.project ? getProject(h.project) : undefined;
             return (
@@ -50,6 +54,18 @@ export function Timeline() {
                   >
                     Project: {project.title}
                   </Link>
+                ) : null}
+                {h.photo ? (
+                  <figure className="mt-3 max-w-md overflow-hidden rounded-lg border border-line">
+                    <Image
+                      src={h.photo.src}
+                      alt={h.photo.alt}
+                      width={h.photo.width}
+                      height={h.photo.height}
+                      sizes="(min-width: 768px) 448px, calc(100vw - 4rem)"
+                      className="h-auto w-full"
+                    />
+                  </figure>
                 ) : null}
               </li>
             );

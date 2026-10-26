@@ -9,6 +9,7 @@ export function MoreProjects() {
       <Container className="flex flex-col gap-8 py-20 md:py-28">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
           <h2
+            data-split
             id="more-title"
             className="font-display text-3xl font-bold tracking-tight"
           >
@@ -21,7 +22,10 @@ export function MoreProjects() {
             All {projects.length} projects <ArrowRight />
           </Link>
         </div>
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul
+          data-reveal-group
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        >
           {moreProjects.map((project) => (
             <li
               key={project.slug}

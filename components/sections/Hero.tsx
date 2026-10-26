@@ -31,9 +31,11 @@ export function Hero({ scene }: { scene?: ReactNode }) {
         </p>
         <p className="max-w-[54ch] text-lg text-muted">{profile.pitch}</p>
         <div className="mt-2 flex flex-wrap gap-3">
-          <ButtonLink href="/projects" size="lg">
-            View projects <ArrowRight />
-          </ButtonLink>
+          <span data-magnetic className="inline-flex">
+            <ButtonLink href="/projects" size="lg">
+              View projects <ArrowRight />
+            </ButtonLink>
+          </span>
           <ButtonLink href="/resume" variant="secondary" size="lg">
             Resume
           </ButtonLink>
