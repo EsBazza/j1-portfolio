@@ -1,16 +1,17 @@
 ## The problem
 
-Faculty evaluations only work if students trust that their answers stay anonymous, and if each department can see its own results without seeing everyone else's.
+Faculty evaluations only work if students trust that their answers stay anonymous, and if each department can see its own results without seeing everyone else's. A shared spreadsheet or a generic form tool can't promise either.
 
 ## What I built
 
-A university-wide evaluation platform for the University of the Assumption that collects, processes and analyses student evaluations of faculty:
+evalUAte is a university-wide evaluation platform for the University of the Assumption that collects, protects and analyses student evaluations of faculty.
 
-- **UA Google sign-in and scoped roles.** System administrators manage the whole platform; department sub-administrators only see their own department, across junior high, senior high, college and graduate school.
-- **Anonymous, encrypted responses.** Evaluations are stored as AES-GCM encrypted bytes, and an HMAC of the student's identity blocks duplicate submissions without linking a student to their answers. Audit logs are encrypted with AES-256-GCM.
-- **Faculty analytics.** Composite scores, cluster averages, radar, bar and trend charts, plus Gemini-written narrative summaries of the written feedback.
-- **Exports.** Multi-page PDF reports of the dashboards and CSV exports of the ratings, attendance and audit tables.
+- **Four access tiers.** Students sign in with their `@ua.edu.ph` Google account and see the form for their level. Faculty see their own results. Department sub-administrators see only their department, and system administrators manage templates, departments, roles and the portal itself.
+- **Anonymous by design.** Each evaluation is encrypted with AES-GCM using its own initialisation vector and auth tag. An HMAC of the student's identity blocks duplicate submissions without ever storing who wrote which answers.
+- **Tamper-evident audit log.** Role changes and configuration edits are written as AES-256-GCM ciphertext, so database edits can't quietly hide administrative actions.
+- **Faculty analytics.** Composite scores, cluster averages, radar, section and trend charts, plus Gemini-written narrative summaries of the written comments.
+- **Exports.** Multi-page PDF reports of the dashboards and CSV exports of ratings, attendance and audit logs.
 
 ## How it works
 
-The Next.js App Router app uses NextAuth for Google OAuth and admin sign-in, Prisma over PostgreSQL for departments, templates, sections and evaluations, and server actions for mutations. Encryption happens before anything is written, so the database only ever holds ciphertext for responses.
+The Next.js App Router app uses Auth.js for domain-locked Google OAuth and admin credentials, Prisma over PostgreSQL for departments, templates, sections and evaluations, and server actions for every mutation. Encryption happens before anything is written, so the database only ever holds ciphertext for responses. Score caches are computed on demand and marked stale when new evaluations arrive, and PDF reports are compiled in the browser from the live dashboard.

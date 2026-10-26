@@ -21,7 +21,8 @@ export const hackathons = z.array(hackathonSchema).parse([
   {
     event: "RAITE 2026",
     year: 2026,
-    location: "Pampanga State University",
+    date: "4 September 2026",
+    location: "Pampanga State University Gymnasium, Bacolor",
     result:
       "Hackathon winner · Best Technical Implementation · Best User Experience",
     rank: { prefix: "#", value: 1 },

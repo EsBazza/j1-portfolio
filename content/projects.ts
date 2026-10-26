@@ -56,9 +56,10 @@ export const projects: Project[] = z
       slug: "mapatunai",
       photos: [photos.canYouHackIt],
       title: "MapaTunAI",
-      tagline: "Public infrastructure transparency map with an AI audit.",
+      tagline:
+        "Mapping what's real: exposing ghost projects across the Philippines.",
       summary:
-        "Maps DPWH projects with contractor records, citizen reports and satellite history, served by a 26-endpoint API. A Gemini audit cross-checks project records, satellite images and citizen reports to flag irregularities.",
+        "A civic transparency platform that checks every public works project against three layers of evidence: DPWH records, OTP-verified citizen reports and satellite imagery. A Gemini audit flags irregularities across more than 240,000 contracts in 18 regions, served by a 26-endpoint API.",
       awards: [
         {
           title: "Top 3",
@@ -72,12 +73,35 @@ export const projects: Project[] = z
         "PostgreSQL (Supabase)",
         "Mapbox GL",
         "Gemini",
+        "ESRI Wayback",
+        "Google Street View",
       ],
       tags: ["ai", "fullstack", "winner"],
       featured: true,
       order: 2,
       team: true,
       repo: "https://github.com/EsBazza/MapaTunAI",
+      live: "https://mapatunai.vercel.app",
+      cover: {
+        src: "/projects/mapatunai/cover.webp",
+        alt: "MapaTunAI landing page: Mapping What's Real — Exposing Ghost Projects Across the Philippines",
+        width: 1440,
+        height: 900,
+      },
+      screenshots: [
+        {
+          src: "/projects/mapatunai/map.webp",
+          alt: "The national map: clustered public works projects across the Philippines on satellite imagery, with region filters and search",
+          width: 1440,
+          height: 900,
+        },
+        {
+          src: "/projects/mapatunai/contractors.webp",
+          alt: "The contractor accountability registry: contractors ranked by award value, with completion rates and overdue flags",
+          width: 1440,
+          height: 900,
+        },
+      ],
       year: 2026,
     },
     {
@@ -146,15 +170,22 @@ export const projects: Project[] = z
       slug: "evaluation",
       title: "evalUAtion",
       tagline:
-        "Secure faculty evaluation system for the University of the Assumption.",
+        "Anonymous, encrypted faculty evaluations for the University of the Assumption.",
       summary:
-        "University-wide portal with UA Google sign-in and role-based access for admins, departments, faculty and students. Anonymous responses are encrypted with AES-256-GCM, duplicates are blocked with HMAC, Gemini writes feedback summaries, and reports export to PDF and CSV.",
+        "A university-wide evaluation portal with domain-locked UA Google sign-in and four access tiers. Responses are encrypted with AES-GCM and de-duplicated with HMAC without linking students to answers, admin actions land in an encrypted audit log, and Gemini turns written feedback into narrative summaries.",
       stack: ["Next.js", "Prisma", "PostgreSQL", "NextAuth", "Gemini"],
       tags: ["ai", "fullstack"],
       featured: true,
       order: 4,
       team: false,
       repo: "https://github.com/EsBazza/evalUAtion",
+      live: "https://eval-ua-te.vercel.app",
+      cover: {
+        src: "/projects/evaluation/cover.webp",
+        alt: "evalUAte sign-in page: University of the Assumption branding and Sign in with Google",
+        width: 1440,
+        height: 900,
+      },
       year: 2026,
     },
     {
@@ -163,7 +194,7 @@ export const projects: Project[] = z
       title: "RAITE 2026 Registration Platform",
       tagline: "Registration site for PSITE Region III's RAITE 2026.",
       summary:
-        "Team-built event registration platform with bulk CSV imports and uploads up to 1.2 GB, hosted on a VPS behind Nginx, PM2 and Cloudflare.",
+        "Team-built registration platform for RAITE 2026's 12 competitions: coaches register teams through a 4-step flow or a bulk CSV upload, track approvals, and submit entries of up to 1.2 GB, served from a VPS behind Nginx, PM2 and Cloudflare.",
       stack: ["Next.js", "Supabase", "Prisma", "Clerk", "Upstash Redis"],
       tags: ["fullstack"],
       featured: false,
@@ -189,13 +220,20 @@ export const projects: Project[] = z
       title: "J1 Movies",
       tagline: "Movie and TV discovery site powered by TMDB.",
       summary:
-        "Browse, search and filter movies and TV series with TMDB data, and keep a watchlist with JSON backup and restore. Titles play through third-party embedded streams, so no video is stored or hosted.",
-      stack: ["Next.js", "Tailwind CSS", "TMDB API"],
+        "A dark cinema-style discovery site for movies, series, anime and K-drama with TMDB data, advanced filters and instant search. A watchlist, watch history and resume points live in the browser with JSON backup, and titles play through third-party embedded streams, so no video is stored or hosted.",
+      stack: ["Next.js", "Tailwind CSS", "TMDB API", "ArtPlayer.js", "hls.js"],
       tags: ["frontend"],
       featured: false,
       order: 7,
       team: false,
       repo: "https://github.com/EsBazza/j1-movies",
+      live: "https://j1-movies.vercel.app",
+      cover: {
+        src: "/projects/j1-movies/cover.webp",
+        alt: "J1 Movies home page: a featured series hero with Play, watchlist and the Top 10 strip",
+        width: 1440,
+        height: 900,
+      },
       year: 2026,
     },
     {
@@ -203,7 +241,7 @@ export const projects: Project[] = z
       title: "PixelForge AI",
       tagline: "Browser photo editor with AI tools.",
       summary:
-        "A canvas photo editor with one-click AI background removal, smart crop suggestions and color palette extraction, running in the browser.",
+        "A local-first canvas photo editor: one-click AI background removal, subject-aware crop suggestions, five-color palette extraction and smart text fitting, all running in the browser with undo, redo and clean exports.",
       context: "Built for the IBM Bob Hackathon",
       stack: ["React", "TypeScript", "Vite", "Fabric.js", "TensorFlow.js"],
       tags: ["ai", "frontend"],
@@ -211,6 +249,13 @@ export const projects: Project[] = z
       order: 8,
       team: false,
       repo: "https://github.com/EsBazza/PixelForge",
+      live: "https://pixel-forge-flax.vercel.app",
+      cover: {
+        src: "/projects/pixelforge-ai/cover.webp",
+        alt: "PixelForge AI editor: tool panel with Smart Suggestions such as Remove Background and Auto Enhance next to the canvas",
+        width: 1440,
+        height: 900,
+      },
       year: 2026,
     },
     {
@@ -218,13 +263,20 @@ export const projects: Project[] = z
       title: "Reel To You",
       tagline: "A movie-quote time capsule.",
       summary:
-        "Send a movie quote and a dedication to a name. Anyone can search a name to read the messages left for it. No accounts.",
+        "A time capsule of movie quotes, addressed to someone and public forever. Pick a film and a line, add a dedication and a name; anyone can search a name to read what was left for it. No accounts, with moderation built in from day one.",
       stack: ["Next.js", "Supabase", "TMDB", "Upstash Redis"],
       tags: ["fullstack"],
       featured: false,
       order: 9,
       team: false,
       repo: "https://github.com/EsBazza/reeltoyou",
+      live: "https://reeltoyou.vercel.app",
+      cover: {
+        src: "/projects/reel-to-you/cover.webp",
+        alt: 'Reel To You home page: "A time capsule of movie quotes. Addressed to someone. Public forever." with Send a moment and Find a name',
+        width: 1440,
+        height: 900,
+      },
       year: 2026,
     },
   ])

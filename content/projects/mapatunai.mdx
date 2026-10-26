@@ -1,14 +1,22 @@
 ## The problem
 
-Checking a public infrastructure project means piecing together the official record, the contractor behind it and what is actually on the ground. MapaTunAI puts all three on one map.
+A road or bridge can be fully paid for on paper and still be bare dirt on the ground. Checking a public works project means piecing together the official record, the contractor behind it and what is actually there, and citizens rarely have any of that in one place.
 
 ## What we built
 
-- **A national map of DPWH infrastructure projects**, seeded with PSA regions and provinces and drawn with Mapbox GL.
-- **Contractor records, citizen reports and satellite history** attached to each project.
-- **An AI audit:** Gemini cross-checks project records, satellite images and citizen reports to flag irregularities.
-- **A 26-endpoint API** that serves the map, the records and the audit.
+MapaTunAI ("Mapping What's Real") is a civic transparency platform that tests every public works project against **three layers of evidence**:
+
+- **What the government claims.** DPWH project records: contract amounts, reported completion, source of funds and official inspection updates.
+- **What citizens experience.** Ground-level reports and ratings from community members, verified with phone OTP and geotagged site photos to keep out spam.
+- **What satellites prove.** ESRI Wayback before-and-after imagery and 360° Google Street View, so anyone can see whether a project was actually built.
+
+On top of that:
+
+- **A national map** of more than 240,000 public works contracts across 18 regions, clustered on satellite, dark and terrain layers, with region filters, search and a "near me" view.
+- **Regional anomaly risk ratings** that show how many projects in each region are flagged.
+- **A contractor accountability registry** that ranks contractors by award value, completion rate and overdue projects, and shows joint-venture patterns.
+- **An AI audit:** Gemini cross-checks a project's records, satellite imagery and citizen reports to flag irregularities.
 
 ## How it works
 
-Project, contractor and report data lives in PostgreSQL on Supabase, accessed through Prisma. The Next.js app renders the map with Mapbox GL and calls Gemini to run the audit on a project's records, imagery and reports.
+DPWH project data, PSA regions and provinces, contractors and citizen reports live in PostgreSQL on Supabase, accessed through Prisma and served by a 26-endpoint Next.js API. The front end renders the map with Mapbox GL, pulls historical imagery from ESRI Wayback, and embeds Street View for on-the-ground checks. Gemini runs the audit, comparing what each layer says about the same project.

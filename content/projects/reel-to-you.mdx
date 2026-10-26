@@ -1,6 +1,6 @@
 ## The problem
 
-Sometimes a line from a film says it better. Reel To You turns a movie quote into a message left for someone, that anyone can find by their name.
+Sometimes a line from a film says it better. Reel To You turns a movie quote into a message left for someone: "a time capsule of movie quotes, addressed to someone, public forever."
 
 ## What I built
 
@@ -8,11 +8,18 @@ A mobile-first time capsule with no accounts:
 
 1. Search for a movie with TMDB.
 2. Pick a curated quote, or write your own.
-3. Add a short dedication and the recipient's name.
-4. Submit, and get a direct link to share.
+3. Optionally attach a short clip.
+4. Add a dedication and the recipient's name, and get a direct link to share.
 
-Anyone can type a name and read every message left for it, newest first.
+Anyone can type a name and read every message ever left for it, newest first, with infinite scroll, like a public guestbook indexed by name. Each entry also has its own share page and a generated social preview image.
 
 ## How it works
 
-Entries live in Supabase Postgres, where the public can only read visible entries and every write goes through a server route. Upstash Redis rate-limits submissions, and names are normalised so searches match however they were typed.
+Because entries are permanent and searchable, moderation was built in from the start:
+
+- **Server-only writes.** The public can read only visible entries in Supabase Postgres; every write goes through an API route with the secret key.
+- **Profanity checks** on the name, dedication and custom quote at submit time.
+- **Community reports:** an entry is hidden automatically after three reports.
+- **Privacy-safe rate limiting:** Upstash Redis allows three submissions per ten minutes, keyed by a hashed IP; raw IPs are never stored.
+
+Names are normalised so a search matches however they were typed, and the feed uses keyset pagination so it stays correct as new entries arrive.

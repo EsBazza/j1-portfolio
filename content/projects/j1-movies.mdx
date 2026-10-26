@@ -1,16 +1,17 @@
 ## The problem
 
-Finding something to watch means jumping between search, ratings, cast pages and a watchlist that lives somewhere else.
+Finding something to watch means jumping between search, ratings, cast pages and a watchlist that lives somewhere else, usually behind an account.
 
 ## What I built
 
-A personal movie and TV discovery site with TMDB data:
+A personal, dark cinema-style discovery site built on TMDB data:
 
-- **Trending, popular and top-rated** movies and series, plus actor and director filmographies.
-- **Discovery filters** for release year, minimum rating, language and genre, and instant search with keyboard suggestions (press `/`).
-- **A watchlist and collections** saved in the browser, with one-click JSON backup and restore to move them between devices.
-- **Playback through third-party embedded streams** with resume and next-episode. No video is stored or hosted by the site.
+- **Catalogs for movies, series, anime and K-drama**, a Top 10 for today, trending and popular rows, and a "Surprise me" button.
+- **Discovery filters** for release year, minimum rating, language and genre, plus instant multi-search across movies, series and people with keyboard suggestions (press `/`).
+- **Rich details pages** with seasons and episodes, cast, and actor and director filmographies.
+- **A library with no account and no database:** watchlist, collections, watch history and resume points live in the browser, with one-click JSON backup and restore to move them between devices.
+- **A custom player** built on ArtPlayer.js and hls.js, with a subtitle sync slider, subtitle styling, local `.srt` and `.vtt` uploads, theater mode and keyboard shortcuts. Titles play through third-party embedded streams; the site does not store or host any video.
 
 ## How it works
 
-The Next.js App Router app talks to TMDB only through a server-side `/api/tmdb` proxy, so the API key never reaches the browser. Library state uses React's `useSyncExternalStore` over `localStorage`, with no database.
+The Next.js App Router app never exposes the TMDB key: every request goes through a server-side `/api/tmdb` proxy that injects the token and sets edge caching (a day for details, an hour for trending and discovery). Library state uses React's `useSyncExternalStore` over `localStorage`, and playback progress is saved every few seconds so titles resume where you left off.

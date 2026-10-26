@@ -1,13 +1,18 @@
 ## The problem
 
-RAITE 2026, PSITE Region III's regional IT competition, needed one place for coaches to register schools and competitors and for teams to submit large media entries, under heavy registration spikes.
+RAITE 2026, PSITE Central Luzon's Regional Assembly on Information Technology Education, ran 12 competitions, from a hackathon to e-sports, culminating on 4 September 2026 at the Pampanga State University Gymnasium in Bacolor. Coaches from across Region III needed one place to register teams, upload documents and submit entries, under heavy registration spikes.
 
 ## What we built
 
-- **Event registration for coaches and competitors**, with bulk Excel and CSV competitor imports.
-- **Large uploads of up to 1.2 GB** for competition media entries, routed through a dedicated upload handler so big transfers don't exhaust memory.
-- **Production hosting on a VPS:** Nginx as the reverse proxy, PM2 to run the app, Let's Encrypt for TLS and Cloudflare for DNS.
+- **A competitions catalog** of all 12 events, searchable and filterable by technical, creative and gaming categories.
+- **Profiles for participants and faculty coaches.** Only coaches can register teams, through a 4-step flow: select the event, enter team information, upload required documents, then review.
+- **Bulk registration:** coaches can register many students at once from a CSV file.
+- **My Registrations,** a dashboard where coaches track each entry's approval status and submit project links for online competitions.
+- **Large uploads of up to 1.2 GB** for media entries, routed through a dedicated upload handler so big transfers don't exhaust memory.
+- **An event assistant** powered by Gemini, grounded in the official event guidelines.
+
+The team was recognised on stage at RAITE 2026 as the student developers of the registration portal.
 
 ## How it works
 
-The Next.js app uses Clerk for sign-in, Supabase PostgreSQL through Prisma with PgBouncer pooling for concurrent registrations, and Upstash Redis for rate limiting. Long-running bulk imports get extended transaction timeouts so large CSV files finish in one go.
+The Next.js app uses Clerk for sign-in, Supabase PostgreSQL through Prisma with PgBouncer pooling for concurrent registrations, Upstash Redis for rate limiting, and Resend and Brevo for email. It runs on a VPS with Nginx as the reverse proxy, PM2 to keep the process alive, Let's Encrypt for TLS and Cloudflare for DNS. Bulk imports get extended transaction timeouts so large CSV files finish in one go.
