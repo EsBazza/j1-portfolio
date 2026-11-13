@@ -2,8 +2,9 @@ import { defineConfig } from "@playwright/test";
 
 const PORT = 3123;
 
-// Runs against the production build (`npm run build` first). Uses the
-// installed Google Chrome, so no browser download is needed.
+// Runs against the production build (`npm run build` first). CI uses the
+// runner's installed Google Chrome, so it needs no browser download; locally
+// it uses Playwright's bundled Chromium (`npx playwright install chromium`).
 export default defineConfig({
   testDir: "e2e",
   fullyParallel: true,
@@ -11,7 +12,7 @@ export default defineConfig({
   reporter: process.env.CI ? "github" : "list",
   use: {
     baseURL: `http://localhost:${PORT}`,
-    channel: "chrome",
+    channel: process.env.CI ? "chrome" : undefined,
   },
   projects: [
     { name: "phone", use: { viewport: { width: 375, height: 812 } } },

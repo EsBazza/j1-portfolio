@@ -1,16 +1,21 @@
 import type { CSSProperties } from "react";
+import Link from "next/link";
+import { announcement } from "@/content/awards";
 import { profile } from "@/content/profile";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { ArrowRight } from "@/components/ui/Icons";
-import { HeroScene } from "@/components/three/HeroScene";
-import { StaticFallback } from "@/components/three/StaticFallback";
+import { HeroStatus } from "@/components/status/HeroStatus";
+import { PetBed } from "@/components/pets/PetBed";
+import { liveDemos } from "@/lib/status";
 
 /** Staggered CSS intro; runs on load without waiting for JavaScript. */
 const intro = (step: number) => ({ "--intro": step }) as CSSProperties;
 
 export function Hero() {
   const chars = [...profile.brand];
+  // The pet sleeps on the D (or the last letter, if the brand changes).
+  const bedAt = chars.includes("D") ? chars.indexOf("D") : chars.length - 1;
 
   return (
     <section
@@ -18,75 +23,96 @@ export function Hero() {
       className="relative isolate overflow-hidden border-b border-line"
     >
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-grid" />
-      <div data-hero-backdrop className="absolute inset-0 -z-10">
-        <StaticFallback />
-        <HeroScene />
-      </div>
-      <Container className="flex min-h-[calc(100svh-4.25rem)] flex-col justify-center gap-6 py-20 md:gap-7">
-        <p className="hero-intro caption text-faint" style={intro(0)}>
-          Build log · {profile.education.degree} · {profile.education.school}
-        </p>
-        <h1
-          id="hero-title"
-          aria-label={`${profile.brand}, ${profile.name}`}
-          className="font-display text-[clamp(5.25rem,24vw,13rem)] leading-[0.85] font-bold tracking-[-0.05em]"
-        >
-          <span
-            aria-hidden="true"
-            className="-mb-[0.16em] inline-flex overflow-hidden pr-[0.12em] pb-[0.16em]"
+      <Container className="grid min-h-[calc(100svh-4.25rem)] content-center items-center py-20">
+        <div className="flex flex-col gap-6 md:gap-7">
+          <Link
+            href={announcement.href}
+            className="hero-intro group inline-flex min-h-11 w-fit max-w-full items-center gap-3 text-sm text-muted transition-colors hover:text-fg"
+            style={intro(0)}
           >
-            {chars.map((ch, i) => (
-              <span
-                key={i}
-                className="hero-char inline-block whitespace-pre"
-                style={{ "--i": i } as CSSProperties}
-              >
-                {ch}
-              </span>
-            ))}
-            <span
-              className="hero-char inline-block text-accent"
-              style={{ "--i": chars.length } as CSSProperties}
-            >
-              .
+            <span className="shrink-0 caption font-semibold text-accent">
+              {announcement.label}
             </span>
-          </span>
-        </h1>
-        <p
-          className="hero-intro font-display text-2xl font-semibold md:text-3xl"
-          style={intro(1)}
-        >
-          {profile.role}
-        </p>
-        <p
-          className="hero-intro max-w-[52ch] text-lg text-muted md:text-xl md:leading-relaxed"
-          style={intro(2)}
-        >
-          {profile.intro}
-        </p>
-        <ul
-          aria-label="Core stack"
-          className="hero-intro flex flex-wrap gap-x-4 gap-y-1"
-          style={intro(3)}
-        >
-          {profile.coreStack.map((item) => (
-            <li key={item} translate="no" className="caption text-faint">
-              <span aria-hidden="true" className="text-accent">
-                ▸{" "}
+            <span className="min-w-0 underline decoration-line-strong underline-offset-4">
+              {announcement.text}
+            </span>
+            <ArrowRight className="shrink-0 transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
+          </Link>
+          <p className="hero-intro caption text-faint" style={intro(0)}>
+            Build log · {profile.education.degree} · {profile.education.school}
+          </p>
+          <h1
+            id="hero-title"
+            aria-label={`${profile.brand}, ${profile.name}`}
+            className="mt-[0.1em] font-display text-[clamp(5.25rem,24vw,13rem)] leading-[0.85] font-semibold tracking-[-0.05em]"
+          >
+            <span className="relative inline-flex">
+              <span
+                aria-hidden="true"
+                className="-mb-[0.16em] inline-flex overflow-hidden pr-[0.12em] pb-[0.16em]"
+              >
+                {chars.map((ch, i) => (
+                  <span
+                    key={i}
+                    className="hero-char inline-block whitespace-pre"
+                    style={{ "--i": i } as CSSProperties}
+                  >
+                    {ch}
+                  </span>
+                ))}
+                <span
+                  data-pet-switch
+                  title="Switch pet"
+                  className="hero-char inline-block cursor-pointer text-accent"
+                  style={{ "--i": chars.length } as CSSProperties}
+                >
+                  .
+                </span>
               </span>
-              {item}
-            </li>
-          ))}
-        </ul>
-        <div className="hero-intro mt-2 flex flex-wrap gap-3" style={intro(4)}>
-          <span data-magnetic className="inline-flex">
-            <ButtonLink href="/projects" size="lg">
-              View projects <ArrowRight />
+              {/* An invisible copy of the title, laid out exactly like it, so the
+                sleeping pet can sit on the D without the intro mask clipping it. */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 flex pr-[0.12em] pb-[0.16em] text-transparent select-none"
+              >
+                {chars.map((ch, i) => (
+                  <span
+                    key={i}
+                    className={
+                      i === bedAt
+                        ? "relative inline-block"
+                        : "inline-block whitespace-pre"
+                    }
+                  >
+                    {ch}
+                    {i === bedAt ? <PetBed /> : null}
+                  </span>
+                ))}
+              </span>
+            </span>
+          </h1>
+          <p
+            className="hero-intro max-w-[52ch] text-lg text-muted md:text-xl md:leading-relaxed"
+            style={intro(1)}
+          >
+            {profile.intro}
+          </p>
+          <div className="hero-intro" style={intro(2)}>
+            <HeroStatus count={liveDemos.length} />
+          </div>
+          <div
+            className="hero-intro mt-2 flex flex-wrap gap-3"
+            style={intro(3)}
+          >
+            <span className="inline-flex">
+              <ButtonLink href="/projects" size="lg">
+                View projects <ArrowRight />
+              </ButtonLink>
+            </span>
+            <ButtonLink href="/resume" variant="secondary" size="lg">
+              Resume
             </ButtonLink>
-          </span>
-          <ButtonLink href="/resume" variant="secondary" size="lg">
-            Resume
-          </ButtonLink>
+          </div>
         </div>
       </Container>
     </section>

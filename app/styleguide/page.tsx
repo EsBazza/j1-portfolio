@@ -31,28 +31,28 @@ const colors = [
 const typeScale = [
   {
     name: "hero",
-    className: "font-display text-hero font-bold text-balance",
+    className: "font-display text-hero font-semibold text-balance",
     sample: "Juno Alonzo",
   },
   {
     name: "display",
-    className: "font-display text-display font-bold",
+    className: "font-display text-display font-semibold",
     sample: "Featured projects",
   },
   {
     name: "title",
-    className: "font-display text-title font-bold",
+    className: "font-display text-title font-semibold",
     sample: "Proctor.AI",
   },
   {
     name: "stat",
-    className: "font-display text-stat font-bold text-accent tabular-nums",
+    className: "font-display text-stat font-semibold text-accent tabular-nums",
     sample: "Top 3",
   },
   {
     name: "lead",
     className: "font-display text-2xl font-semibold",
-    sample: "Full-Stack & AI Developer",
+    sample: "Student, builder, hackathon regular.",
   },
   {
     name: "body",
@@ -85,7 +85,7 @@ export default function StyleguidePage() {
       <Container className="flex flex-wrap items-end justify-between gap-6 border-b border-line py-12">
         <div className="flex flex-col gap-3">
           <p className="caption text-faint">Design system · v0.1 · Build log</p>
-          <h1 className="font-display text-hero font-bold">
+          <h1 className="font-display text-hero font-semibold">
             Styleguide<span className="text-accent">.</span>
           </h1>
         </div>
@@ -255,7 +255,7 @@ function ThemePanel({ theme }: { theme: Theme }) {
                 <p className="caption text-accent">
                   Project 01 · Hackathon Winner · RAITE 2026
                 </p>
-                <h4 className="font-display text-title font-bold">
+                <h4 className="font-display text-title font-semibold">
                   Proctor.AI
                 </h4>
                 <p className="text-muted">

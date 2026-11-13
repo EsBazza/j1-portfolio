@@ -1,5 +1,4 @@
 import { profile } from "@/content/profile";
-import { builtWith } from "@/lib/site";
 import { Container } from "@/components/ui/Container";
 import { GitHub, LinkedIn, Mail } from "@/components/ui/Icons";
 
@@ -22,17 +21,14 @@ export function Footer() {
       <Container aria-hidden="true" className="pt-12">
         <p
           data-split-chars
-          className="font-display text-[clamp(5rem,24vw,22rem)] leading-[0.8] font-bold tracking-[-0.06em] text-line-strong select-none"
+          className="font-display text-[clamp(5rem,24vw,22rem)] leading-[0.8] font-semibold tracking-[-0.06em] text-line-strong select-none"
         >
           {profile.brand}
         </p>
       </Container>
       <Container className="flex flex-col gap-8 py-12 md:flex-row md:items-end md:justify-between">
         <div className="flex flex-col gap-3">
-          <p className="font-display text-2xl font-bold">{profile.name}</p>
-          <p className="caption text-faint">
-            Built with {builtWith.join(" · ")}
-          </p>
+          <p className="font-display text-2xl font-semibold">{profile.name}</p>
           <p className="caption text-faint">Last updated {lastUpdated}</p>
         </div>
         <ul className="flex gap-2">

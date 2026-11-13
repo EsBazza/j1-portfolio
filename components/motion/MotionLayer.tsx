@@ -7,9 +7,49 @@ import { onFirstInteraction } from "./interaction";
 
 let lenis: Lenis | null = null;
 
+/** Back to the top: smooth through Lenis when it runs, native otherwise. */
+export function scrollToTop() {
+  if (lenis) {
+    lenis.scrollTo(0);
+    return;
+  }
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+}
+
+/** Jumps to the top at once, e.g. when the page layout is swapped. */
+export function jumpToTop() {
+  if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
+  else window.scrollTo(0, 0);
+}
+
 /** Lets per-page code re-measure after a route change. */
 export function resizeSmoothScroll() {
   lenis?.resize();
+}
+
+/**
+ * Stop Lenis's glide on the spot, so the next page starts where the router
+ * puts it. If Lenis is still easing toward an old target when a link is
+ * clicked, its next frame would drag the new page back down to that target.
+ */
+function freezeSmoothScroll() {
+  lenis?.scrollTo(window.scrollY, { immediate: true, force: true });
+}
+
+/** A click that will make the router load another page. */
+function isPageChangeClick(event: MouseEvent) {
+  if (event.defaultPrevented || event.button !== 0) return false;
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+    return false;
+  const link = (event.target as Element | null)?.closest?.("a[href]");
+  if (!(link instanceof HTMLAnchorElement)) return false;
+  if (link.target && link.target !== "_self") return false;
+  const url = new URL(link.href, window.location.href);
+  return (
+    url.origin === window.location.origin &&
+    url.pathname !== window.location.pathname
+  );
 }
 
 /**
@@ -51,8 +91,22 @@ export function MotionLayer() {
       card.style.setProperty("--sx", `${e.clientX - r.left}px`);
       card.style.setProperty("--sy", `${e.clientY - r.top}px`);
     };
+    // Inspect overlay: show the hovered card's real size, like DevTools.
+    const onOver = (e: PointerEvent) => {
+      const card = (e.target as Element | null)?.closest?.<HTMLElement>(
+        "[data-inspect]",
+      );
+      const size = card?.querySelector("[data-inspect-size]");
+      if (!card || !size) return;
+      const r = card.getBoundingClientRect();
+      size.textContent = `${Math.round(r.width)} × ${Math.round(r.height)}`;
+    };
     document.addEventListener("pointermove", onMove, { passive: true });
-    return () => document.removeEventListener("pointermove", onMove);
+    document.addEventListener("pointerover", onOver, { passive: true });
+    return () => {
+      document.removeEventListener("pointermove", onMove);
+      document.removeEventListener("pointerover", onOver);
+    };
   }, []);
 
   // Smooth scrolling with Lenis, driven by GSAP's ticker. Off for reduced motion.
@@ -74,7 +128,15 @@ export function MotionLayer() {
           gsap.ticker.add(tick);
           gsap.ticker.lagSmoothing(0);
           lenis = instance;
+          const onClick = (event: MouseEvent) => {
+            if (isPageChangeClick(event)) freezeSmoothScroll();
+          };
+          // Capture phase: runs before the router starts navigating.
+          document.addEventListener("click", onClick, true);
+          window.addEventListener("popstate", freezeSmoothScroll);
           cleanup = () => {
+            document.removeEventListener("click", onClick, true);
+            window.removeEventListener("popstate", freezeSmoothScroll);
             gsap.ticker.remove(tick);
             instance.destroy();
             lenis = null;

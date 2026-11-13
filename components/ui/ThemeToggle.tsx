@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { THEME_COLORS, THEME_STORAGE_KEY, type Theme } from "@/lib/theme";
+import { currentTheme, setTheme, type Theme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
 function subscribe(onChange: () => void) {
@@ -13,8 +13,7 @@ function subscribe(onChange: () => void) {
   return () => observer.disconnect();
 }
 
-const getTheme = (): Theme =>
-  document.documentElement.dataset.theme === "light" ? "light" : "dark";
+const getTheme = currentTheme;
 
 const getServerTheme = (): Theme => "dark";
 
@@ -23,17 +22,7 @@ export function ThemeToggle({ className }: { className?: string }) {
   const theme = useSyncExternalStore(subscribe, getTheme, getServerTheme);
   const next: Theme = theme === "dark" ? "light" : "dark";
 
-  function toggle() {
-    document.documentElement.dataset.theme = next;
-    document
-      .querySelector('meta[name="theme-color"]')
-      ?.setAttribute("content", THEME_COLORS[next]);
-    try {
-      localStorage.setItem(THEME_STORAGE_KEY, next);
-    } catch {
-      // Storage can be unavailable (private mode); the switch still applies.
-    }
-  }
+  const toggle = () => setTheme(next);
 
   return (
     <button

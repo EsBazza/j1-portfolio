@@ -64,7 +64,7 @@ export async function sendContact(
   if (field(formData, "company")) {
     return {
       status: "success",
-      message: "Thanks! Your message is on its way.",
+      message: "Thanks. Your message is on its way.",
     };
   }
 
@@ -132,6 +132,6 @@ export async function sendContact(
 
   return {
     status: "success",
-    message: "Thanks! Your message is on its way. I'll reply by email.",
+    message: "Thanks. Your message is on its way. I'll reply by email.",
   };
 }

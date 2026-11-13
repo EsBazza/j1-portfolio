@@ -32,11 +32,10 @@ export function Contact() {
       <div className="grid gap-12 lg:grid-cols-12">
         <div className="flex flex-col gap-6 lg:col-span-5">
           <SectionHeading id="contact-title" eyebrow="Contact">
-            Let&apos;s talk.
+            Let&apos;s talk
           </SectionHeading>
           <p className="max-w-[46ch] text-lg text-muted">
-            Open to {profile.seeking.toLowerCase()}. Send a message, or reach me
-            directly.
+            Open to {profile.seeking}. Send a message, or reach me directly.
           </p>
           <ul className="flex flex-col gap-1">
             {links.map(({ label, href, Icon, external }) => (

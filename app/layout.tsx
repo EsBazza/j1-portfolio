@@ -7,6 +7,10 @@ import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { MotionLayer } from "@/components/motion/MotionLayer";
 import "./globals.css";
+import { CommandPalette } from "@/components/palette/CommandPalette";
+import { paletteItems } from "@/lib/palette";
+import { RouteTracker } from "@/components/layout/BackLink";
+import { PetLayer } from "@/components/pets/PetLayer";
 
 const display = Bricolage_Grotesque({
   variable: "--font-bricolage",
@@ -70,12 +74,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         <div aria-hidden="true" className="scroll-progress print:hidden" />
+        <RouteTracker />
+        <PetLayer />
         <Header />
         <main id="main" tabIndex={-1} className="flex-1 outline-none">
           {children}
         </main>
         <Footer />
         <MotionLayer />
+        <CommandPalette items={paletteItems()} />
       </body>
     </html>
   );

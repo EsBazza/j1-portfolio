@@ -1,8 +1,10 @@
+import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProject, projectCaption, projects } from "@/content/projects";
+import { BackLink } from "@/components/layout/BackLink";
 import { Container } from "@/components/ui/Container";
 import { ArrowLeft, ArrowRight } from "@/components/ui/Icons";
 import { Tag } from "@/components/ui/Tag";
@@ -10,6 +12,12 @@ import { BrowserFrame } from "@/components/ui/BrowserFrame";
 import { ProjectCover } from "@/components/projects/ProjectCover";
 import { ProjectLinks } from "@/components/projects/ProjectLinks";
 import { StackTags } from "@/components/projects/StackTags";
+import { PhotoMosaic } from "@/components/projects/PhotoMosaic";
+
+// Every slug is prerendered from generateStaticParams, so the page is static
+// HTML per project; the instant-navigation check would otherwise ask for a
+// Suspense fallback around params that this page never needs.
+export const instant = false;
 
 export function generateStaticParams() {
   return projects.map((p) => ({ slug: p.slug }));
@@ -45,15 +53,19 @@ export default async function CaseStudyPage({
   return (
     <article className="pb-20 md:pb-32">
       <Container className="flex flex-col gap-8 pt-10 md:pt-16">
-        <Link
-          href="/projects"
-          className="inline-flex min-h-11 w-fit items-center gap-2 caption text-muted hover:text-fg"
-        >
-          <ArrowLeft /> All projects
-        </Link>
+        <BackLink href="/projects" from={["/", "/projects"]}>
+          Back
+        </BackLink>
         <header className="flex flex-col gap-5">
-          <p className="caption text-accent">{projectCaption(project)}</p>
-          <h1 className="font-display text-hero font-bold text-balance">
+          <p
+            className={cn(
+              "caption",
+              project.awards.length > 0 ? "text-accent" : "text-faint",
+            )}
+          >
+            {projectCaption(project)}
+          </p>
+          <h1 className="font-display text-hero font-semibold text-balance">
             {project.title}
           </h1>
           {project.aka ? (
@@ -79,7 +91,7 @@ export default async function CaseStudyPage({
           <section aria-labelledby="role-title">
             <h2
               id="role-title"
-              className="mt-14 mb-5 font-display text-title font-bold"
+              className="mt-14 mb-5 font-display text-title font-semibold"
             >
               My role
             </h2>
@@ -100,7 +112,7 @@ export default async function CaseStudyPage({
             <section aria-labelledby="results-title">
               <h2
                 id="results-title"
-                className="mt-14 mb-5 font-display text-title font-bold"
+                className="mt-14 mb-5 font-display text-title font-semibold"
               >
                 Results
               </h2>
@@ -159,7 +171,7 @@ export default async function CaseStudyPage({
 
       {project.screenshots.length > 0 ? (
         <Container className="mt-20 flex flex-col gap-8">
-          <h2 className="font-display text-title font-bold">Screenshots</h2>
+          <h2 className="font-display text-title font-semibold">Screenshots</h2>
           <ul data-reveal-group className="grid gap-6 md:grid-cols-2">
             {project.screenshots.map((shot) => (
               <li key={shot.src}>
@@ -187,26 +199,10 @@ export default async function CaseStudyPage({
 
       {project.photos.length > 0 ? (
         <Container className="mt-20 flex flex-col gap-8">
-          <h2 className="font-display text-title font-bold">From the event</h2>
-          <ul data-reveal-group className="grid gap-6 md:grid-cols-2">
-            {project.photos.map((photo) => (
-              <li key={photo.src}>
-                <figure className="flex flex-col gap-3">
-                  <Image
-                    src={photo.src}
-                    alt=""
-                    width={photo.width}
-                    height={photo.height}
-                    sizes="(min-width: 768px) 50vw, 100vw"
-                    className="h-auto max-h-[36rem] w-full rounded-lg border border-line bg-surface object-contain"
-                  />
-                  <figcaption className="text-sm text-muted">
-                    {photo.alt}
-                  </figcaption>
-                </figure>
-              </li>
-            ))}
-          </ul>
+          <h2 className="font-display text-title font-semibold">
+            {project.slug === "uacap" ? "From the defense" : "From the event"}
+          </h2>
+          <PhotoMosaic id="event-photos" photos={project.photos} />
         </Container>
       ) : null}
 

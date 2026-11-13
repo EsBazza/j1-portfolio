@@ -10,6 +10,7 @@ import { skills } from "@/content/skills";
 import { Container } from "@/components/ui/Container";
 import { Download } from "@/components/ui/Icons";
 import { PrintButton } from "./PrintButton";
+import { resumePdfs } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Resume",
@@ -18,10 +19,7 @@ export const metadata: Metadata = {
 };
 
 // Juno's own resume PDFs; a button appears for each file that exists.
-const pdfs = [
-  { label: "Classic PDF", file: "Amaro_Alonzo_Resume_Classic.pdf" },
-  { label: "Modern PDF", file: "Amaro_Alonzo_Resume_Modern.pdf" },
-].filter(({ file }) =>
+const pdfs = resumePdfs.filter(({ file }) =>
   existsSync(path.join(process.cwd(), "public", "resume", file)),
 );
 
@@ -45,7 +43,7 @@ export default function ResumePage() {
     <Container className="max-w-5xl py-16 md:py-24 print:py-0">
       <header className="flex flex-col gap-6 pb-10 print:pb-4">
         <div className="flex flex-col gap-2">
-          <h1 className="font-display text-display font-bold">
+          <h1 className="font-display text-display font-semibold">
             {profile.name}
           </h1>
           <p className="font-display text-xl font-semibold">{profile.role}</p>
@@ -89,7 +87,7 @@ export default function ResumePage() {
             {p}
           </p>
         ))}
-        <p className="text-muted">Seeking {profile.seeking.toLowerCase()}.</p>
+        <p className="text-muted">Seeking {profile.seeking}.</p>
       </ResumeSection>
 
       <ResumeSection title="Technical skills">

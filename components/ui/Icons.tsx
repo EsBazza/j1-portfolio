@@ -45,6 +45,22 @@ export function ArrowLeft(props: IconProps) {
   );
 }
 
+export function Close(props: IconProps) {
+  return (
+    <Stroke {...props}>
+      <path d="M6 6l12 12M18 6 6 18" />
+    </Stroke>
+  );
+}
+
+export function Expand(props: IconProps) {
+  return (
+    <Stroke {...props}>
+      <path d="M15 4h5v5M9 20H4v-5M20 4l-6 6M4 20l6-6" />
+    </Stroke>
+  );
+}
+
 export function Download(props: IconProps) {
   return (
     <Stroke {...props}>

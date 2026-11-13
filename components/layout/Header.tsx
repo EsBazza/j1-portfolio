@@ -4,6 +4,9 @@ import { sections } from "@/lib/site";
 import { ButtonLink } from "@/components/ui/Button";
 import { Menu } from "@/components/ui/Icons";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { BriefSwitch } from "@/components/layout/BriefSwitch";
+import { HomeLink } from "@/components/layout/HomeLink";
+import { PaletteButton } from "@/components/palette/PaletteButton";
 
 // The mobile menu is a <details> element so it works without JavaScript.
 export function Header() {
@@ -16,12 +19,10 @@ export function Header() {
         aria-label="Primary"
         className="mx-auto flex w-full max-w-7xl items-center gap-6 px-4 py-3 md:px-8 xl:px-20"
       >
-        <Link
-          href="/"
-          className="mr-auto inline-flex min-h-11 items-center caption font-medium text-fg"
-        >
+        {/* Scrolls back to the top on the home page, goes home elsewhere. */}
+        <HomeLink className="mr-auto inline-flex min-h-11 items-center caption font-medium text-fg">
           {profile.name}
-        </Link>
+        </HomeLink>
 
         <ul className="hidden items-center gap-6 lg:flex">
           {sections.map((s) => (
@@ -29,7 +30,7 @@ export function Header() {
               <a
                 href={`/#${s.id}`}
                 data-nav-link={s.id}
-                className="inline-flex min-h-11 items-center border-b border-transparent caption text-muted hover:text-fg aria-[current=location]:border-accent aria-[current=location]:text-fg"
+                className="inline-flex min-h-11 items-center border-b border-transparent caption text-muted hover:text-fg aria-[current=location]:border-fg aria-[current=location]:text-fg"
               >
                 {s.label}
               </a>
@@ -38,6 +39,8 @@ export function Header() {
         </ul>
 
         <div className="flex items-center gap-2">
+          <BriefSwitch />
+          <PaletteButton />
           <ThemeToggle />
           <ButtonLink
             href="/resume"

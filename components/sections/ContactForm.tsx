@@ -75,7 +75,7 @@ export function ContactForm() {
       </div>
 
       <div className="flex flex-wrap items-center gap-4">
-        <span data-magnetic className="inline-flex">
+        <span className="inline-flex">
           <Button type="submit" size="lg" disabled={pending}>
             {pending ? "Sending…" : "Send message"}
           </Button>

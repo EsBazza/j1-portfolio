@@ -1,6 +1,8 @@
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { projectCaption, tagLabels } from "@/content/projects";
 import type { Project } from "@/content/schema";
+import { InspectOverlay } from "./InspectOverlay";
 import { ProjectCover } from "./ProjectCover";
 
 /** Grid card on /projects; the whole card links to the case study. */
@@ -14,7 +16,7 @@ export function ProjectCard({
   return (
     <article
       data-spotlight
-      data-tilt
+      data-inspect
       className="group relative flex h-full flex-col gap-5 overflow-hidden rounded-xl border border-line bg-surface p-3 hover:border-line-strong"
     >
       <ProjectCover
@@ -25,8 +27,15 @@ export function ProjectCard({
         className="rounded-lg"
       />
       <div className="flex flex-1 flex-col gap-2.5 px-3 pb-3">
-        <p className="caption text-accent">{projectCaption(project)}</p>
-        <h2 className="font-display text-2xl font-bold tracking-tight">
+        <p
+          className={cn(
+            "caption",
+            project.awards.length > 0 ? "text-accent" : "text-faint",
+          )}
+        >
+          {projectCaption(project)}
+        </p>
+        <h2 className="font-display text-2xl font-semibold tracking-tight">
           <Link
             href={`/projects/${project.slug}`}
             className="after:absolute after:inset-0"
@@ -42,6 +51,7 @@ export function ProjectCard({
             .join(" · ")}
         </p>
       </div>
+      <InspectOverlay tag="article" name={project.slug} stack={project.stack} />
     </article>
   );
 }

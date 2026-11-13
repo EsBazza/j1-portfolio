@@ -21,6 +21,8 @@
   --on-accent: #0d0d0b;
   --grid-line: rgb(237 235 228 / 0.045);
   --focus: #edebe4;
+  --inspect: #8ab4f8;
+  --ok: #4ade80;
 }
 
 [data-theme="light"] {
@@ -37,6 +39,8 @@
   --on-accent: #ffffff;
   --grid-line: rgb(20 20 18 / 0.06);
   --focus: #141412;
+  --inspect: #1a5fd0;
+  --ok: #15803d;
 }
 
 /* Motion tokens, shared with JS animation code. */
@@ -58,6 +62,8 @@
   --color-line-strong: var(--line-strong);
   --color-accent: var(--accent);
   --color-on-accent: var(--on-accent);
+  --color-inspect: var(--inspect);
+  --color-ok: var(--ok);
 
   --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
@@ -72,7 +78,7 @@
 
   --text-label: 0.75rem;
   --text-label--line-height: 1.4;
-  --text-label--letter-spacing: 0.08em;
+  --text-label--letter-spacing: 0.02em;
   --text-hero: clamp(3rem, 8.5vw, 7.5rem);
   --text-hero--line-height: 0.9;
   --text-hero--letter-spacing: -0.04em;
@@ -89,13 +95,12 @@
   --radius-lg: 0.625rem;
 }
 
-/* Mono label used for captions, eyebrows and stack tags. */
+/* Mono label used for captions, eyebrows and stack tags. Sentence case. */
 @utility caption {
   font-family: var(--font-mono);
   font-size: var(--text-label);
   line-height: var(--text-label--line-height);
   letter-spacing: var(--text-label--letter-spacing);
-  text-transform: uppercase;
 }
 
 /* Faint 12-column grid lines behind a section. */
@@ -227,7 +232,7 @@
     border-radius: 9999px;
     background: radial-gradient(
       circle,
-      color-mix(in oklab, var(--accent) 16%, transparent),
+      color-mix(in oklab, var(--fg) 7%, transparent),
       transparent 70%
     );
     transform: translate(var(--sx, -999px), var(--sy, -999px));
@@ -310,13 +315,124 @@
   }
 }
 
+/*
+ * DevTools-style inspect on project cards: hovering one tints it like an
+ * inspected element and shows a tooltip with its size and stack. The size is
+ * measured on hover (MotionLayer). Pointer devices only.
+ */
+[data-inspect-box] {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-inspect-box] {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    border: 1px dashed var(--inspect);
+    border-radius: inherit;
+    background: color-mix(in oklab, var(--inspect) 9%, transparent);
+    opacity: 0;
+  }
+
+  [data-inspect]:hover [data-inspect-box],
+  [data-inspect]:focus-within [data-inspect-box] {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    [data-inspect-box] {
+      transition: opacity var(--duration-fast) var(--ease-out);
+    }
+
+    [data-inspect-tag] {
+      transform: translateY(-4px);
+      transition: transform var(--duration-base) var(--ease-out);
+    }
+
+    [data-inspect]:hover [data-inspect-tag],
+    [data-inspect]:focus-within [data-inspect-tag] {
+      transform: none;
+    }
+  }
+}
+
+/* Command palette: the panel drops in slightly as it opens. */
+@media (prefers-reduced-motion: no-preference) {
+  .palette[open] .palette-panel {
+    animation: palette-in var(--duration-fast) var(--ease-out);
+  }
+}
+
+@keyframes palette-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+
+/* Live status: an online dot sends out one ring when the check returns. */
+.status-ok {
+  position: relative;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .status-ok::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    background: var(--ok);
+    /* One ring when the check returns; the class is only added then. */
+    animation: status-ring 1.2s var(--ease-out) both;
+  }
+}
+
+@keyframes status-ring {
+  from {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  70%,
+  to {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+
+/* Photo viewer: fades in; each photo settles in as you step through. */
+@media (prefers-reduced-motion: no-preference) {
+  .lightbox[open] {
+    animation: lightbox-in var(--duration-base) var(--ease-out);
+  }
+
+  .lightbox-photo {
+    animation: lightbox-photo-in var(--duration-slow) var(--ease-out);
+  }
+}
+
+@keyframes lightbox-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes lightbox-photo-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
 /* Reading progress under the header (scroll-driven, no JavaScript). */
 .scroll-progress {
   position: fixed;
   inset: 0 0 auto;
   z-index: 60;
   height: 2px;
-  background: var(--accent);
+  background: var(--fg);
   transform: scaleX(0);
   transform-origin: 0 50%;
   pointer-events: none;
@@ -337,84 +453,84 @@
   }
 }
 
-/* Tech marquee. */
-.marquee {
-  overflow: hidden;
-  mask-image: linear-gradient(
-    to right,
-    transparent,
-    #000 8%,
-    #000 92%,
-    transparent
-  );
+/* The 30-second view (header switch): only the hero, the award strip, the
+   award rows in compact form and contact stay. */
+html[data-view="brief"] [data-brief="hide"],
+html[data-view="brief"] :is(#skills, #about) {
+  display: none;
 }
 
-.marquee-track {
-  display: flex;
-  width: max-content;
+html[data-view="brief"] [data-brief="tight"] {
+  padding-bottom: 2rem;
 }
 
-.marquee ul {
-  display: flex;
-  gap: 3rem;
-  padding-right: 3rem;
-  font-family: var(--font-mono);
-  font-size: var(--text-label);
-  letter-spacing: var(--text-label--letter-spacing);
-  text-transform: uppercase;
-  color: var(--muted);
-  white-space: nowrap;
+/* The hero pet asleep on the D (components/pets/PetBed.tsx). Plain SVG; the
+   chosen pet comes from html[data-pet]; hidden while it's awake. */
+.pet-bed {
+  left: 50%;
+  bottom: calc(100% - 0.1em);
+  width: max(2.25rem, 0.38em);
+  margin-left: calc(max(2.25rem, 0.38em) * -0.5 + 0.03em);
+  transform-origin: 50% 100%;
 }
-
-.marquee li::before {
-  content: "▸";
-  margin-right: 0.75rem;
-  color: var(--accent);
+html:not([data-pet="cat"]) .pet-bed [data-species="cat"],
+html[data-pet="cat"] .pet-bed [data-species="dog"] {
+  display: none;
+}
+html[data-pet-awake] .pet-bed {
+  visibility: hidden;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .marquee-track {
-    animation: marquee 45s linear infinite;
+  .pet-bed {
+    animation: pet-in 500ms var(--ease-out) 900ms both;
   }
-
-  .marquee:hover .marquee-track,
-  .marquee:focus-within .marquee-track {
-    animation-play-state: paused;
+  .pet-bed svg {
+    transform-origin: 50% 100%;
+    animation: pet-breathe 3.2s ease-in-out infinite;
   }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .marquee {
-    mask-image: none;
+  .pet-z {
+    animation: pet-z 3.2s ease-out infinite;
   }
-
-  .marquee-track,
-  .marquee ul {
-    width: auto;
-    flex-wrap: wrap;
-    justify-content: center;
-    row-gap: 0.75rem;
-    white-space: normal;
-  }
-
-  .marquee-copy {
-    display: none;
+  .pet-bed.pet-poof {
+    animation: pet-poof 420ms var(--ease-out);
   }
 }
 
-@keyframes marquee {
-  to {
-    transform: translateX(-50%);
+@keyframes pet-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.05em);
   }
 }
-
-/* 3D hero: the canvas fades in over the static sphere once it renders. */
-[data-static-fallback],
-.scene-fade {
-  transition: opacity var(--duration-slow) var(--ease-out);
+@keyframes pet-breathe {
+  50% {
+    transform: scaleY(0.96);
+  }
 }
-
-[data-hero-backdrop]:not([data-3d-ready]) .scene-fade,
-[data-3d-ready] [data-static-fallback] {
-  opacity: 0;
+@keyframes pet-z {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0.08em, -0.25em);
+  }
+}
+@keyframes pet-poof {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(0.7, 1.25);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }

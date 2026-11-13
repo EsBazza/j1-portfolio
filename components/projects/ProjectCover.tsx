@@ -44,14 +44,14 @@ export function ProjectCover({
         <div className="relative flex aspect-[16/10] flex-col justify-between overflow-hidden bg-grid p-5 sm:p-8">
           <span
             aria-hidden="true"
-            className="absolute -right-4 -bottom-10 font-display text-[10rem] leading-none font-bold text-line select-none sm:text-[14rem]"
+            className="absolute -right-4 -bottom-10 font-display text-[10rem] leading-none font-semibold text-line select-none sm:text-[14rem]"
           >
             {String(project.order).padStart(2, "0")}
           </span>
           <span className="relative caption text-faint">
             Screenshot coming soon
           </span>
-          <span className="relative font-display text-3xl font-bold tracking-tight sm:text-4xl">
+          <span className="relative font-display text-3xl font-semibold tracking-tight sm:text-4xl">
             {project.title}
           </span>
         </div>

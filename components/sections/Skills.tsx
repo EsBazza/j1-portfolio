@@ -10,7 +10,7 @@ export function Skills() {
     >
       <div className="flex flex-col gap-12">
         <SectionHeading id="skills-title" eyebrow="Skills">
-          What I build with.
+          What I build with
         </SectionHeading>
         <div
           data-reveal-group

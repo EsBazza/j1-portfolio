@@ -7,6 +7,7 @@ import {
   projects,
   type ProjectFilter,
 } from "@/content/projects";
+import { BackLink } from "@/components/layout/BackLink";
 import { Container } from "@/components/ui/Container";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import { cn } from "@/lib/utils";
@@ -26,10 +27,13 @@ export default async function ProjectsPage({
 }: PageProps<"/projects">) {
   const { tag } = await searchParams;
   return (
-    <Container className="flex flex-col gap-10 py-16 md:py-24">
+    <Container className="flex flex-col gap-10 py-10 md:py-16">
       <header className="flex flex-col gap-4">
+        <BackLink href="/#projects" from={["/"]}>
+          Back to build log
+        </BackLink>
         <p className="caption text-faint">Index · {projects.length} projects</p>
-        <h1 className="font-display text-hero font-bold">Projects</h1>
+        <h1 className="font-display text-hero font-semibold">Projects</h1>
       </header>
       <ProjectIndex filter={isProjectFilter(tag) ? tag : "all"} />
     </Container>

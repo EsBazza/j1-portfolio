@@ -3,14 +3,10 @@ import { profile } from "@/content/profile";
 import { siteUrl } from "@/lib/site";
 import { About } from "@/components/sections/About";
 import { AwardStrip } from "@/components/sections/AwardStrip";
-import { Certifications } from "@/components/sections/Certifications";
 import { Contact } from "@/components/sections/Contact";
-import { FeaturedProjects } from "@/components/sections/FeaturedProjects";
+import { BuildLog } from "@/components/sections/BuildLog";
 import { Hero } from "@/components/sections/Hero";
-import { MoreProjects } from "@/components/sections/MoreProjects";
 import { Skills } from "@/components/sections/Skills";
-import { StackMarquee } from "@/components/sections/StackMarquee";
-import { Timeline } from "@/components/sections/Timeline";
 
 const personJsonLd = {
   "@context": "https://schema.org",
@@ -41,13 +37,9 @@ export default function Home() {
       />
       <Hero />
       <AwardStrip />
-      <StackMarquee />
-      <FeaturedProjects />
-      <MoreProjects />
-      <Timeline />
+      <BuildLog />
       <Skills />
       <About />
-      <Certifications />
       <Contact />
     </>
   );

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { awardStrip } from "../content/awards";
 import { projects } from "../content/projects";
 
 const routes = [
@@ -39,7 +40,7 @@ for (const route of routes) {
 test("unknown routes get the custom 404", async ({ page }) => {
   const response = await page.goto("/not-a-page");
   expect(response?.status()).toBe(404);
-  await expect(page.getByRole("heading", { name: "Lost node." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Lost node" })).toBeVisible();
 });
 
 test("every page has a skip link and one main landmark", async ({ page }) => {
@@ -68,6 +69,22 @@ test("the theme toggle switches and remembers the theme", async ({ page }) => {
   await expect(html).toHaveAttribute("data-theme", "light");
 });
 
+test("the pet sleeps on the D: hover wakes it, the dot switches it, D puts it to bed", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const bed = page.locator("[data-pet-bed]");
+  const awake = page.locator("[data-pet-sprite]");
+  await expect(bed).toBeVisible();
+  await page.locator("[data-pet-switch]").click({ force: true });
+  await expect(page.locator("html")).toHaveAttribute("data-pet", "cat");
+  await bed.click();
+  await expect(awake).toHaveCount(1);
+  await page.keyboard.press("d");
+  await expect(awake).toHaveCount(0, { timeout: 10000 });
+  await expect(bed).toBeVisible();
+});
+
 test("the contact form validates on the server", async ({ page }) => {
   await page.goto("/#contact");
   await page.getByRole("button", { name: "Send message" }).click();
@@ -78,12 +95,11 @@ test("the contact form validates on the server", async ({ page }) => {
 test.describe("reduced motion", () => {
   test.use({ reducedMotion: "reduce" });
 
-  test("skips 3D, pinning and smooth scroll; content stays visible", async ({
+  test("skips pinning and smooth scroll; content stays visible", async ({
     page,
   }) => {
     await page.goto("/", { waitUntil: "networkidle" });
     await page.waitForTimeout(1500);
-    await expect(page.locator("[data-hero-backdrop] canvas")).toHaveCount(0);
     await expect(page.locator("[data-pinned]")).toHaveCount(0);
     await expect(page.locator("html")).not.toHaveClass(/lenis/);
     await expect(page.getByText("Hackathon winner").first()).toBeVisible();
@@ -101,9 +117,11 @@ test.describe("without JavaScript", () => {
         page.locator("h3", { hasText: p.title }).first(),
       ).toBeVisible();
     }
-    await expect(page.locator("[data-countup]").first()).toHaveText("1");
+    await expect(page.locator("[data-odometer]").first()).toHaveText(
+      String(awardStrip[0]?.value),
+    );
     await expect(
-      page.getByRole("heading", { name: "Hackathon log." }),
+      page.getByRole("heading", { name: "Built, shipped and judged" }),
     ).toBeVisible();
   });
 

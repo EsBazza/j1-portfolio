@@ -2,14 +2,13 @@ import { EASE, gsap, ScrollTrigger, SplitText } from "@/lib/gsap";
 import { isShown } from "./reveal";
 
 const MOTION_OK = "(prefers-reduced-motion: no-preference)";
-const FINE_POINTER = "(hover: hover) and (pointer: fine)";
 
 /**
  * Enhances the server-rendered page under `root` through data attributes:
  * - data-split: headings reveal line by line (SplitText)
- * - data-countup: numbers count up once
- * - data-featured-pin: featured projects pin and scrub on large screens
- * - data-magnetic: primary buttons lean toward the cursor
+ * - data-odometer: numbers roll into place once, digit by digit
+ * - data-stamps / data-stamp: award stamps press in once
+ * - data-timeline / data-log-dot: the log line draws, its dots fill in
  * Returns a cleanup that reverts everything.
  */
 export function initMotion(root: HTMLElement) {
@@ -34,40 +33,74 @@ export function initMotion(root: HTMLElement) {
     });
 
     const restore: Array<() => void> = [];
-    root.querySelectorAll<HTMLElement>("[data-countup]").forEach((el) => {
-      const end = Number(el.dataset.countup);
-      if (!Number.isFinite(end) || !isShown(el)) return;
-      // Already on screen: keep the final value rather than flash to zero.
+    // Numbers roll into place like an odometer, one column per digit.
+    root.querySelectorAll<HTMLElement>("[data-odometer]").forEach((el) => {
+      const text = el.textContent ?? "";
+      if (!/^\d+$/.test(text) || !isShown(el)) return;
+      // Already on screen: keep the number rather than flash to zero.
       if (el.getBoundingClientRect().top < window.innerHeight) return;
-      const state = { value: 0 };
-      el.textContent = "0";
-      restore.push(() => {
-        el.textContent = String(end);
+      const settle = () => {
+        el.textContent = text;
+      };
+      restore.push(settle);
+
+      // Screen readers get the plain number; the columns are decoration.
+      const label = document.createElement("span");
+      label.className = "sr-only";
+      label.textContent = text;
+      // An invisible copy of the number gives the wheel the text's exact
+      // box and baseline; the rolling columns sit on top of it.
+      const wheel = document.createElement("span");
+      wheel.setAttribute("aria-hidden", "true");
+      wheel.style.cssText =
+        "position:relative;display:inline-block;line-height:1";
+      const ghost = document.createElement("span");
+      ghost.style.cssText = "visibility:hidden";
+      ghost.textContent = text;
+      const reel = document.createElement("span");
+      reel.style.cssText =
+        "position:absolute;inset:0;display:flex;overflow:hidden";
+      const columns = [...text].map((digit) => {
+        const column = document.createElement("span");
+        column.style.cssText = "display:flex;flex-direction:column";
+        for (let n = 0; n <= Number(digit); n++) {
+          const cell = document.createElement("span");
+          cell.style.cssText = "height:1em;line-height:1";
+          cell.textContent = String(n);
+          column.append(cell);
+        }
+        reel.append(column);
+        return column;
       });
-      gsap.to(state, {
-        value: end,
+      wheel.append(ghost, reel);
+      el.replaceChildren(label, wheel);
+
+      gsap.to(columns, {
+        // Each column holds 0…digit, so its last cell is the digit itself.
+        y: (i: number) => `-${Number(text[i])}em`,
         duration: 0.6,
         ease: EASE,
-        snap: { value: 1 },
-        onUpdate: () => {
-          el.textContent = String(state.value);
-        },
+        stagger: { each: 0.05, from: "end" },
         scrollTrigger: { trigger: el, start: "top 92%", once: true },
-      });
-    });
-    // Captions decode like a terminal line when they scroll in.
-    root.querySelectorAll<HTMLElement>("[data-scramble]").forEach((el) => {
-      if (!isShown(el)) return;
-      const text = el.textContent ?? "";
-      gsap.to(el, {
-        duration: 0.6,
-        ease: "none",
-        scrambleText: { text, chars: "01<>/_#", speed: 0.6 },
-        scrollTrigger: { trigger: el, start: "top 90%", once: true },
+        onComplete: settle,
       });
     });
 
-    // The hackathon log's accent line draws down as you scroll through it.
+    // Award stamps press in once, a quick scale-down as the row arrives.
+    root.querySelectorAll<HTMLElement>("[data-stamps]").forEach((group) => {
+      if (!isShown(group)) return;
+      if (group.getBoundingClientRect().top < window.innerHeight) return;
+      gsap.from(group.querySelectorAll("[data-stamp]"), {
+        scale: 1.18,
+        autoAlpha: 0,
+        duration: 0.3,
+        ease: EASE,
+        stagger: 0.05,
+        scrollTrigger: { trigger: group, start: "top 85%", once: true },
+      });
+    });
+
+    // The build log's accent line draws down as you scroll through it.
     root
       .querySelectorAll<HTMLElement>("[data-timeline]")
       .forEach((timeline) => {
@@ -87,6 +120,20 @@ export function initMotion(root: HTMLElement) {
             },
           },
         );
+        // Each commit dot fills in once as the line reaches it.
+        timeline
+          .querySelectorAll<HTMLElement>("[data-log-dot]")
+          .forEach((dot) => {
+            if (dot.getBoundingClientRect().top < window.innerHeight * 0.65)
+              return;
+            gsap.from(dot, {
+              scale: 0.4,
+              autoAlpha: 0,
+              duration: 0.2,
+              ease: EASE,
+              scrollTrigger: { trigger: dot, start: "top 65%", once: true },
+            });
+          });
       });
 
     // Big wordmarks reveal letter by letter.
@@ -110,111 +157,6 @@ export function initMotion(root: HTMLElement) {
 
     // Reverting mid-way (route change, preference change) must not leave a 0.
     return () => restore.forEach((fn) => fn());
-  });
-
-  mm.add(`${MOTION_OK} and (min-width: 1024px)`, () => {
-    const pin = root.querySelector<HTMLElement>("[data-featured-pin]");
-    if (!pin || !isShown(pin)) return;
-    const panels = gsap.utils.toArray<HTMLElement>("[data-panel]", pin);
-    const markers = gsap.utils.toArray<HTMLElement>("[data-panel-index]", pin);
-    if (panels.length < 2) return;
-
-    const steps = panels.length - 1;
-    const setActive = (index: number) =>
-      markers.forEach((m, i) => m.toggleAttribute("data-active", i === index));
-
-    pin.setAttribute("data-pinned", "");
-    setActive(0);
-    gsap.set(panels.slice(1), { autoAlpha: 0, y: 48 });
-
-    const timeline = gsap.timeline({
-      defaults: { ease: "none", duration: 1 },
-      scrollTrigger: {
-        trigger: pin,
-        start: "top top",
-        end: () => `+=${steps * window.innerHeight * 0.9}`,
-        pin: true,
-        scrub: 0.5,
-        snap: {
-          snapTo: 1 / steps,
-          duration: { min: 0.2, max: 0.6 },
-          ease: "power1.inOut",
-        },
-        invalidateOnRefresh: true,
-        onUpdate: (self) => setActive(Math.round(self.progress * steps)),
-      },
-    });
-    // Hand off in sequence (old out, then new in) so text never overlaps.
-    panels.slice(1).forEach((panel, i) => {
-      timeline
-        .to(panels[i], { autoAlpha: 0, y: -48, duration: 0.5 })
-        .fromTo(
-          panel,
-          { autoAlpha: 0, y: 48 },
-          { autoAlpha: 1, y: 0, duration: 0.5 },
-        );
-    });
-
-    return () => {
-      pin.removeAttribute("data-pinned");
-      markers.forEach((m) => m.removeAttribute("data-active"));
-    };
-  });
-
-  mm.add(`${MOTION_OK} and ${FINE_POINTER}`, () => {
-    const cleanups = [...root.querySelectorAll<HTMLElement>("[data-magnetic]")]
-      .filter(isShown)
-      .map((el) => {
-        const toX = gsap.quickTo(el, "x", { duration: 0.4, ease: EASE });
-        const toY = gsap.quickTo(el, "y", { duration: 0.4, ease: EASE });
-        const move = (e: PointerEvent) => {
-          const r = el.getBoundingClientRect();
-          toX((e.clientX - (r.left + r.width / 2)) * 0.25);
-          toY((e.clientY - (r.top + r.height / 2)) * 0.25);
-        };
-        const leave = () => {
-          toX(0);
-          toY(0);
-        };
-        el.addEventListener("pointermove", move);
-        el.addEventListener("pointerleave", leave);
-        return () => {
-          el.removeEventListener("pointermove", move);
-          el.removeEventListener("pointerleave", leave);
-        };
-      });
-
-    // Cards tilt toward the cursor in 3D.
-    const tilts = [...root.querySelectorAll<HTMLElement>("[data-tilt]")]
-      .filter(isShown)
-      .map((el) => {
-        gsap.set(el, { transformPerspective: 900 });
-        const toX = gsap.quickTo(el, "rotationX", {
-          duration: 0.5,
-          ease: EASE,
-        });
-        const toY = gsap.quickTo(el, "rotationY", {
-          duration: 0.5,
-          ease: EASE,
-        });
-        const move = (e: PointerEvent) => {
-          const r = el.getBoundingClientRect();
-          toY(((e.clientX - r.left) / r.width - 0.5) * 8);
-          toX(-((e.clientY - r.top) / r.height - 0.5) * 8);
-        };
-        const leave = () => {
-          toX(0);
-          toY(0);
-        };
-        el.addEventListener("pointermove", move);
-        el.addEventListener("pointerleave", leave);
-        return () => {
-          el.removeEventListener("pointermove", move);
-          el.removeEventListener("pointerleave", leave);
-        };
-      });
-
-    return () => [...cleanups, ...tilts].forEach((fn) => fn());
   });
 
   ScrollTrigger.refresh();

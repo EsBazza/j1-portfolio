@@ -34,11 +34,23 @@ export const projectSchema = z.object({
   order: z.number().int(),
   team: z.boolean(),
   repo: z.url().optional(),
+  /** "YYYY-MM" that orders the build log: the month the repository was
+   *  created, or the month of a milestone when there is no repository. */
+  logMonth: z
+    .string()
+    .regex(/^\d{4}-(0[1-9]|1[0-2])$/)
+    .optional(),
   live: z.url().optional(),
   cover: imageSchema.optional(),
   screenshots: z.array(imageSchema).default([]),
   /** Photos from the event the project was built or recognised at. */
   photos: z.array(imageSchema).default([]),
+  /** A 480×630 JPEG or PNG in public/ for the share image (the OG renderer
+   *  can't read WebP). */
+  ogPhoto: z
+    .string()
+    .regex(/^\/.+\.(jpe?g|png)$/)
+    .optional(),
   /** Juno's role; shown as a TODO until filled in. */
   role: z.string().optional(),
   year: z.number().int().optional(),
@@ -58,8 +70,6 @@ export const profileSchema = z.object({
   pitch: z.string().min(1),
   /** The hero's longer introduction. */
   intro: z.string().min(1),
-  /** Core stack shown under the hero introduction. */
-  coreStack: z.array(z.string().min(1)).min(1),
   location: z.string().min(1),
   email: z.email(),
   links: z.object({ github: linkSchema, linkedin: linkSchema }),
@@ -85,11 +95,25 @@ export const hackathonSchema = z.object({
   result: z.string().min(1),
   /** Short form for the award strip, e.g. "Top 3". */
   rank: z
-    .object({ prefix: z.string(), value: z.number().int().positive() })
+    .object({
+      prefix: z.string(),
+      value: z.number().int().positive(),
+      /** Field size, e.g. 285 teams. */
+      of: z.number().int().positive().optional(),
+    })
     .optional(),
   project: z.string().optional(),
   highlight: z.boolean().default(false),
   photo: imageSchema.optional(),
+  /** A public post about the result, e.g. Juno's announcement. */
+  source: z.object({ label: z.string().min(1), href: z.url() }).optional(),
+});
+
+/** The "New" line above the hero title, linking to the latest result. */
+export const announcementSchema = z.object({
+  label: z.string().min(1),
+  text: z.string().min(1),
+  href: z.string().startsWith("/"),
 });
 
 export const skillGroupSchema = z.object({

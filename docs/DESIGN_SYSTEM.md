@@ -24,7 +24,7 @@ Visual direction canvas (Claude Design, private to the owner): https://claude.ai
 | `accent`      | `#F2A93B`      | `#A6560A` | Awards and calls to action only |
 | `on-accent`   | `#0D0D0B`      | `#FFFFFF` | Text on accent (9.7 / 5.3 : 1)  |
 
-- **Type:** Bricolage Grotesque (display, opsz axis), Geist (body, 16/1.6), JetBrains Mono (`caption` utility: 12px uppercase, +8% tracking). Scale utilities: `text-hero`, `text-display`, `text-title`, `text-stat`, `text-label`.
+- **Type:** Bricolage Grotesque (display, opsz axis), Geist (body, 16/1.6), JetBrains Mono (`caption` utility: 12px, sentence case). Scale utilities: `text-hero`, `text-display`, `text-title`, `text-stat`, `text-label`.
 - **Space:** 4px base (Tailwind default). 12 columns, page margin 16 / 32 / 80px, max width 1280px (`Container`), section rhythm 80px phone / 128px desktop (`Section`).
 - **Motion:** one curve, `--ease-out: cubic-bezier(0.22, 1, 0.36, 1)`; `--duration-fast` 200ms, `--duration-base` 400ms, `--duration-slow` 600ms, `--stagger` 50ms. Transform and opacity only.
 - **Theme:** `data-theme` on `<html>` (dark default, stored choice applied before paint by `lib/theme.ts`). Any subtree can set `data-theme` to scope a theme.
