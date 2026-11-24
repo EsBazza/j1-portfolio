@@ -1,10 +1,5 @@
 import type { PetId } from "@/lib/pets";
-import {
-  CAT_LEGACY_COLORS,
-  CAT_LEGACY_FRAMES,
-  LEGACY_H,
-  LEGACY_W,
-} from "./cat-legacy";
+import { CAT_COLORS, CAT_POSES, drawCat, type CatFrameName } from "./cat";
 import { DOG_COLORS, DOG_POSES, drawDog, type DogFrameName } from "./dog";
 import { ART_H, ART_W, type Frame } from "./raster";
 
@@ -76,22 +71,35 @@ const dog: PetArt = {
   engine: (name) => dogFrame(DOG_ENGINE[name]),
 };
 
-const catFrame = (name: string): Frame => {
-  const frame = (CAT_LEGACY_FRAMES as Record<string, Frame>)[name];
-  if (!frame) throw new Error(`Unknown cat frame "${name}"`);
-  return frame;
+const isCatFrame = (name: string): name is CatFrameName => name in CAT_POSES;
+
+const CAT_ENGINE: Record<EngineFrame, CatFrameName> = {
+  stand: "stand",
+  runA: "run1",
+  runB: "run3",
+  sit: "sit",
+  blink: "blink",
+  wag: "swish3",
+  curl: "curl1",
+  bow: "stretch",
+  crouch: "crouch1",
 };
 
+const catFrame = cached((name) => {
+  if (!isCatFrame(name)) throw new Error(`Unknown cat frame "${name}"`);
+  return drawCat(name);
+});
+
 const cat: PetArt = {
-  w: LEGACY_W,
-  h: LEGACY_H,
-  colors: CAT_LEGACY_COLORS,
-  names: Object.keys(CAT_LEGACY_FRAMES),
+  w: ART_W,
+  h: ART_H,
+  colors: CAT_COLORS,
+  names: Object.keys(CAT_POSES),
   frame: catFrame,
-  engine: catFrame,
+  engine: (name) => catFrame(CAT_ENGINE[name]),
 };
 
 export const PET_ART: Record<PetId, PetArt> = { dog, cat };
 
 /** The sleeping frame drawn on the D of "J1 Dev.". */
-export const BED_FRAME: Record<PetId, string> = { dog: "curl1", cat: "curl" };
+export const BED_FRAME: Record<PetId, string> = { dog: "curl1", cat: "curl1" };

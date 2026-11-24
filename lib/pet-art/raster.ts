@@ -87,6 +87,30 @@ export function limb(
   };
 }
 
+/** A filled polygon (pointed ears), shaded from its centre outwards. */
+export function polygon(
+  points: readonly (readonly [number, number])[],
+  tones: Tones,
+): Shape {
+  const cx = points.reduce((sum, [x]) => sum + x, 0) / points.length;
+  const cy = points.reduce((sum, [, y]) => sum + y, 0) / points.length;
+  const r = Math.max(...points.map(([x, y]) => Math.hypot(x - cx, y - cy)), 1);
+  return {
+    tones,
+    sample: (x, y) => {
+      let inside = false;
+      for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+        const [xi, yi] = points[i]!;
+        const [xj, yj] = points[j]!;
+        if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi)
+          inside = !inside;
+      }
+      if (!inside) return null;
+      return (((x - cx) * LIGHT_X + (y - cy) * LIGHT_Y) / r) * 1.4;
+    },
+  };
+}
+
 /** Single pixels in one colour (eyes, noses, tags). */
 export function pixels(
   points: readonly (readonly [number, number])[],
