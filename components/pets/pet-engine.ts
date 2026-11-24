@@ -1,12 +1,9 @@
 import {
-  BONE_COLOR,
-  HEART_COLOR,
-  PET_H,
-  PET_W,
-  type FrameName,
-  type Pet,
-  type PetId,
-} from "@/lib/pets";
+  PET_ART,
+  type EngineFrame as FrameName,
+  type PetArt,
+} from "@/lib/pet-art";
+import { BONE_COLOR, HEART_COLOR, type Pet, type PetId } from "@/lib/pets";
 
 /**
  * The awake pet. Plain DOM + canvas on one requestAnimationFrame loop, loaded
@@ -87,11 +84,18 @@ function bump(id: PetId, key: keyof Stats) {
 
 // --------------------------------------------------------------- drawing
 
-function makeCanvas(scale: number) {
+function sizeCanvas(canvas: HTMLCanvasElement, art: PetArt, scale: number) {
+  canvas.width = art.w * RES;
+  canvas.height = art.h * RES;
+  canvas.style.width = `${art.w * scale}px`;
+  canvas.style.height = `${art.h * scale}px`;
+}
+
+function makeCanvas(art: PetArt, scale: number) {
   const canvas = document.createElement("canvas");
-  canvas.width = PET_W * RES;
-  canvas.height = PET_H * RES;
-  canvas.style.cssText = `display:block;width:${PET_W * scale}px;height:${PET_H * scale}px;image-rendering:pixelated`;
+  canvas.style.display = "block";
+  canvas.style.imageRendering = "pixelated";
+  sizeCanvas(canvas, art, scale);
   return canvas;
 }
 
@@ -102,10 +106,11 @@ function painter(canvas: HTMLCanvasElement) {
     const key = `${pet.id}:${frame}`;
     if (!ctx || key === last) return;
     last = key;
+    const art = PET_ART[pet.id];
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    pet.frames[frame].forEach((row, y) => {
+    art.engine(frame).forEach((row, y) => {
       for (let x = 0; x < row.length; x++) {
-        const color = pet.colors[row[x] ?? "."];
+        const color = art.colors[row[x] ?? "."];
         if (!color) continue;
         ctx.fillStyle = color;
         ctx.fillRect(x * RES, y * RES, RES, RES);
@@ -268,8 +273,8 @@ export function openCard({
   dialog.className =
     "m-auto w-[min(92vw,24rem)] overflow-visible rounded-lg border border-line bg-surface p-0 text-fg backdrop:bg-black/60";
 
-  const scale = 12;
-  const big = makeCanvas(scale);
+  const art = PET_ART[pet.id];
+  const big = makeCanvas(art, Math.round(216 / art.w));
   big.style.cursor = "grab";
   const paint = painter(big);
   paint(pet, "sit");
@@ -414,11 +419,18 @@ export function mountPet({
     return r && r.width > 0 ? r : null;
   };
 
-  // Same size as the pet on the D, or a default off the home page.
+  // Same size as the pet on the D, or a default off the home page; whole
+  // canvas pixels per sprite pixel so the art stays crisp.
   const startBed = bedRect();
-  const scale = Math.max(2, Math.min(5, (startBed?.width ?? 64) / PET_W));
-  const W = PET_W * scale;
-  const H = PET_H * scale;
+  const targetW = Math.max(36, Math.min(100, startBed?.width ?? 64));
+  const sizeFor = (p: Pet) => {
+    const art = PET_ART[p.id];
+    const s = Math.max(1, Math.round(targetW / art.w));
+    return { art, s, w: art.w * s, h: art.h * s };
+  };
+  const size = sizeFor(pet);
+  let W = size.w;
+  let H = size.h;
 
   const root = document.createElement("div");
   root.dataset.petSprite = "";
@@ -427,7 +439,7 @@ export function mountPet({
     "pointer-events-none fixed top-0 left-0 z-[70] select-none print:hidden";
   const body = document.createElement("div");
   body.style.transformOrigin = "50% 100%";
-  const canvas = makeCanvas(scale);
+  const canvas = makeCanvas(size.art, size.s);
   canvas.style.pointerEvents = "auto";
   canvas.style.cursor = "pointer";
   const paint = painter(canvas);
@@ -944,6 +956,12 @@ export function mountPet({
     setPet: (next) => {
       poof(x + W / 2, y + H / 2);
       pet = next;
+      const bottom = y + H;
+      const resized = sizeFor(next);
+      sizeCanvas(canvas, resized.art, resized.s);
+      W = resized.w;
+      H = resized.h;
+      y = bottom - H;
       sx = 0.6;
       sy = 1.3;
       say(next.name, 1000);

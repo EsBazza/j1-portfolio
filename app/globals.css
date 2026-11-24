@@ -468,9 +468,9 @@ html[data-view="brief"] [data-brief="tight"] {
    chosen pet comes from html[data-pet]; hidden while it's awake. */
 .pet-bed {
   left: 50%;
-  bottom: calc(100% - 0.1em);
-  width: max(2.25rem, 0.38em);
-  margin-left: calc(max(2.25rem, 0.38em) * -0.5 + 0.03em);
+  bottom: calc(100% - 0.13em);
+  width: max(2.6rem, 0.44em);
+  margin-left: calc(max(2.6rem, 0.44em) * -0.5 + 0.03em);
   transform-origin: 50% 100%;
 }
 html:not([data-pet="cat"]) .pet-bed [data-species="cat"],

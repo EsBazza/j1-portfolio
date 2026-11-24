@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
+import { PetSheet } from "@/components/pets/PetSheet";
 import { BrowserFrame } from "@/components/ui/BrowserFrame";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { Card, CardBody } from "@/components/ui/Card";
@@ -99,6 +100,15 @@ export default function StyleguidePage() {
         <ThemePanel theme="dark" />
         <ThemePanel theme="light" />
       </div>
+
+      <Section grid aria-labelledby="pets" className="border-t border-line">
+        <div className="flex flex-col gap-10">
+          <SectionHeading id="pets" eyebrow="Hero pets">
+            Sprite sheet
+          </SectionHeading>
+          <PetSheet />
+        </div>
+      </Section>
     </main>
   );
 }

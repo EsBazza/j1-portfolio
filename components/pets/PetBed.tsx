@@ -1,4 +1,5 @@
-import { frameRuns, PET_H, PET_ORDER, PET_W, PETS } from "@/lib/pets";
+import { BED_FRAME, frameRuns, PET_ART } from "@/lib/pet-art";
+import { PET_ORDER } from "@/lib/pets";
 
 /**
  * The pet asleep on the D of "J1 Dev.": plain SVG in the server HTML, so it
@@ -13,17 +14,17 @@ export function PetBed() {
       className="pet-bed pointer-events-auto absolute z-10 cursor-pointer"
     >
       {PET_ORDER.map((id) => {
-        const pet = PETS[id];
+        const art = PET_ART[id];
         return (
           <svg
             key={id}
             data-species={id}
-            viewBox={`0 0 ${PET_W} ${PET_H}`}
+            viewBox={`0 0 ${art.w} ${art.h}`}
             shapeRendering="crispEdges"
             className="block h-auto w-full"
             role="presentation"
           >
-            {frameRuns(pet.frames.curl, pet.colors).map((r) => (
+            {frameRuns(art.frame(BED_FRAME[id]), art.colors).map((r) => (
               <rect
                 key={`${r.x}-${r.y}`}
                 x={r.x}
