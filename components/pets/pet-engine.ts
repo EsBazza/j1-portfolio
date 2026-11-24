@@ -1,17 +1,17 @@
-import {
-  PET_ART,
-  type EngineFrame as FrameName,
-  type PetArt,
-} from "@/lib/pet-art";
+import { clipFrame, PET_ART, type ClipName, type PetArt } from "@/lib/pet-art";
 import { BONE_COLOR, HEART_COLOR, type Pet, type PetId } from "@/lib/pets";
 
 /**
  * The awake pet. Plain DOM + canvas on one requestAnimationFrame loop, loaded
  * only when the pet wakes. Animates transform and opacity only.
  *
+ * Each state plays a clip from lib/pet-art (walk and run frames advance with
+ * distance, so the legs match the speed; turning eases through a squash).
+ *
  * Behaviour (a small state machine with some randomness):
- * wake (stretch, hop down) → chase the pointer → sniff → sit (blink, wag or
- * tail flick, head tilt, the odd bark) → yawn → nap. Shaking the pointer sets
+ * wake (stretch, hop down) → walk or run to the pointer → sniff → sit (blink,
+ * wag or tail swish, looks up, head tilt, the odd bark) → lie down → yawn →
+ * nap. Shaking the pointer sets
  * off zoomies; a click near it makes it hop; double-click throws a bone (the
  * dog fetches it, the cat refuses); the cat sometimes ignores you to groom and
  * pounces on a cursor that stops at a distance. Clicking the pet opens its
@@ -19,7 +19,8 @@ import { BONE_COLOR, HEART_COLOR, type Pet, type PetId } from "@/lib/pets";
  */
 
 const RES = 6; // canvas pixels per sprite pixel
-const SLEEP_AFTER = 9; // s without pointer movement
+const LIE_AFTER = 4.5; // s without pointer movement before lying down
+const SLEEP_AFTER = 9; // s without pointer movement before a nap
 const EDGE = 8;
 
 type Mode =
@@ -27,6 +28,7 @@ type Mode =
   | "chase"
   | "sniff"
   | "sit"
+  | "lie"
   | "groom"
   | "crouch"
   | "pounce"
@@ -102,13 +104,13 @@ function makeCanvas(art: PetArt, scale: number) {
 function painter(canvas: HTMLCanvasElement) {
   const ctx = canvas.getContext("2d");
   let last = "";
-  return (pet: Pet, frame: FrameName) => {
+  return (pet: Pet, frame: string) => {
     const key = `${pet.id}:${frame}`;
     if (!ctx || key === last) return;
     last = key;
     const art = PET_ART[pet.id];
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    art.engine(frame).forEach((row, y) => {
+    art.frame(frame).forEach((row, y) => {
       for (let x = 0; x < row.length; x++) {
         const color = art.colors[row[x] ?? "."];
         if (!color) continue;
@@ -331,7 +333,7 @@ export function openCard({
   };
   zoom(false);
 
-  // Idle life on the card: blink and wag; petting closes the eyes.
+  // Idle life on the card: blink and wag; petting makes it happy.
   let pettingUntil = 0;
   let travelled = 0;
   let countedThisSession = false;
@@ -340,12 +342,12 @@ export function openCard({
   const start = performance.now();
   const loop = (now: number) => {
     const t = (now - start) / 1000;
-    let frame: FrameName = "sit";
-    if (now < pettingUntil) {
-      frame = Math.floor(t / 0.12) % 2 ? "blink" : pet.wags ? "wag" : "blink";
-    } else if (t % 3.2 < 0.14) frame = "blink";
-    else if (pet.wags && Math.floor(t / 0.4) % 4 === 0)
-      frame = Math.floor(t / 0.1) % 2 ? "wag" : "sit";
+    const clips = art.clips;
+    let frame = clipFrame(clips.sit, t);
+    if (now < pettingUntil)
+      frame = clipFrame(pet.wags ? clips.wag : clips.pant, t);
+    else if (t % 3.2 < 0.14) frame = clipFrame(clips.blink, t);
+    else if (t % 6 > 4) frame = clipFrame(clips.wag, t);
     paint(pet, frame);
     raf = requestAnimationFrame(loop);
   };
@@ -444,10 +446,14 @@ export function mountPet({
   canvas.style.cursor = "pointer";
   const paint = painter(canvas);
   body.append(canvas);
+  // A soft shadow that stays on the ground when the pet jumps.
+  const shadow = document.createElement("div");
+  shadow.className =
+    "absolute bottom-[3%] left-[20%] h-[9%] w-[60%] rounded-full bg-black/30";
   const bubble = document.createElement("span");
   bubble.className =
     "absolute bottom-full left-1/2 mb-1 -translate-x-1/2 rounded-sm border border-line-strong bg-surface px-1.5 py-0.5 font-mono text-xs whitespace-nowrap text-fg opacity-0 transition-opacity duration-200";
-  root.append(body, bubble);
+  root.append(shadow, body, bubble);
   document.body.append(root);
 
   let bubbleTimer = 0;
@@ -485,8 +491,13 @@ export function mountPet({
   let jump: { start: number; dur: number; h: number } | null = null;
   let sx = 1;
   let sy = 1;
-  let runClock = 0;
-  let runFrame: FrameName = "runA";
+  // Gait clock: advances with distance travelled, so legs match the speed.
+  let gait = 0;
+  // Drawn facing; eases towards `facing` so turning reads as a quick squash.
+  let shownFacing = 1;
+  let landUntil = 0;
+  let pantUntil = 0;
+  let happyUntil = 0;
   let travelled = 0;
   let pawSide = 1;
   let chaseFrom = 0;
@@ -518,6 +529,7 @@ export function mountPet({
   const land = () => {
     sx = 1.18;
     sy = 0.82;
+    landUntil = performance.now() + 140;
     dust(x + W / 2, y + H - 4, 4);
   };
 
@@ -679,8 +691,9 @@ export function mountPet({
     const dist = Math.hypot(dx, dy);
     const idle = (now - lastMove) / 1000;
     const pointerDist = Math.hypot(px - (x + W / 2), py - (y + H / 2));
-    let frame: FrameName = "sit";
-    let tilt = 0;
+    const art = PET_ART[pet.id];
+    let clip: ClipName = "sit";
+    let clipT = modeTime;
     let wiggle = 0;
 
     const moving = [
@@ -692,22 +705,25 @@ export function mountPet({
       "pounce",
     ].includes(mode);
     if (moving) {
+      // Calm by default: it walks over unless you're far away or it's excited.
       const boost =
         mode === "zoomies"
           ? 1.7
           : mode === "bed" || mode === "pounce"
             ? 1.4
-            : 1;
+            : mode === "chase" && dist < 320
+              ? 0.5
+              : 1;
       const speed = Math.min(pet.speed * boost, dist * 3.4);
-      const k = Math.min(1, dt * (mode === "pounce" ? 12 : 7));
+      const k = Math.min(1, dt * (mode === "pounce" ? 12 : 6));
       const before = Math.hypot(vx, vy);
       vx += ((dist ? dx / dist : 0) * speed - vx) * k;
       vy += ((dist ? dy / dist : 0) * speed - vy) * k;
       const pace = Math.hypot(vx, vy);
-      // Stretch as it takes off, kick up dust.
-      if (before < 120 && pace >= 120) {
-        sx = 1.12;
-        sy = 0.92;
+      // Stretch as it takes off at a run, kick up dust.
+      if (before < 140 && pace >= 140) {
+        sx = 1.1;
+        sy = 0.93;
         dust(x + W / 2 - facing * W * 0.3, y + H - 4, 3);
       }
       x += vx * dt;
@@ -717,13 +733,16 @@ export function mountPet({
       }
       if (Math.abs(vx) > 20) facing = vx > 0 ? 1 : -1;
 
-      runClock += dt;
-      if (runClock > Math.max(0.065, 0.16 - pace / 3200)) {
-        runClock = 0;
-        runFrame = runFrame === "runA" ? "runB" : "runA";
-      }
-      frame = pace > 25 ? runFrame : "stand";
-      if (mode === "pounce") frame = "runB";
+      // Walk below ~120 px/s, run above; one frame per stride step, so the
+      // legs keep pace with the ground.
+      const running = pace > 120;
+      gait += (pace * dt) / (W * (running ? 0.2 : 0.11));
+      const carrying = mode === "return";
+      if (pace > 22) {
+        clip = carrying ? "carryRun" : running ? "run" : "walk";
+        clipT = Math.floor(gait) / art.clips[clip].fps;
+      } else clip = carrying ? "carry" : "stand";
+      if (mode === "pounce") clip = "pounce";
 
       // Paw prints every so often.
       travelled += pace * dt;
@@ -739,7 +758,7 @@ export function mountPet({
           vx = vy = 0;
           if (chaseFrom > 260) bump(pet.id, "caught");
           chaseFrom = 0;
-          setMode("sniff", 0.8);
+          setMode("sniff", 0.9);
         }
       } else if (mode === "bed") {
         if (dist < 4 || (!bedRect() && x < -W - 40)) {
@@ -751,6 +770,7 @@ export function mountPet({
           zoomiesLeft -= 1;
           if (zoomiesLeft <= 0) {
             setMode("chase");
+            pantUntil = now + 2600;
             say("*pant*", 900);
           } else {
             zoomTarget = randomSpot();
@@ -766,12 +786,12 @@ export function mountPet({
           setMode("return");
         }
       } else if (mode === "return") {
-        frame = pace > 25 ? runFrame : "stand";
         if (arrived) {
           vx = vy = 0;
           bump(pet.id, "caught");
           say(pick(pet.sounds) ?? "", 900);
           hop(12, 0.35);
+          pantUntil = now + 2000;
           setMode("sit");
         }
       } else if (mode === "pounce") {
@@ -789,12 +809,15 @@ export function mountPet({
       facing = px >= x + W / 2 ? 1 : -1;
       // A wide comfort zone, so small mouse moves while reading don't set it off.
       const wantsToFollow = !staying && dist > 140;
-      if (wantsToFollow && ["sit", "sniff", "nap", "yawn"].includes(mode)) {
-        if (mode === "nap" || mode === "yawn") {
+      if (
+        wantsToFollow &&
+        ["sit", "sniff", "lie", "nap", "yawn"].includes(mode)
+      ) {
+        if (mode === "nap" || mode === "yawn" || mode === "lie") {
+          if (mode !== "lie") say("!", 600);
           setMode("sit", 0);
-          say("!", 600);
           hop(8, 0.25);
-          modeTime = -0.4; // wait a beat before running
+          modeTime = -0.4; // wait a beat before getting up
         } else if (mode === "sit" && modeTime > 0) {
           if (Math.random() < pet.aloof) {
             setMode("groom", 1.4 + Math.random() * 1.6);
@@ -811,9 +834,9 @@ export function mountPet({
 
     switch (mode) {
       case "wake": {
-        frame = modeTime < 0.7 ? "bow" : "stand";
+        clip = modeTime < 0.7 ? "stretch" : "stand";
         if (modeTime < 0.7) {
-          sx += (1.08 - sx) * 0.2;
+          sx += (1.06 - sx) * 0.2;
         }
         if (modeTime > 0.85) {
           hop(18, 0.4);
@@ -823,35 +846,37 @@ export function mountPet({
         break;
       }
       case "sniff":
-        frame = "stand";
-        tilt = Math.floor(modeTime / 0.14) % 2 ? 3 : 0;
+        clip = "sniff";
         if (modeTime > modeLength) setMode("sit");
         break;
       case "sit": {
-        frame = "sit";
+        clip = now < pantUntil ? "pant" : now < happyUntil ? "happy" : "sit";
         // Blink now and then.
         nextBlink -= dt;
         if (nextBlink <= 0) {
           blinkUntil = now + 140;
           nextBlink = 2.2 + Math.random() * 3.5;
         }
-        // Tail: the dog wags when you're close; the cat flicks now and then.
-        if (pet.wags && pointerDist < 170) {
-          frame = Math.floor(modeTime / 0.11) % 2 ? "wag" : "sit";
-        } else if (!pet.wags) {
+        // Tail: the dog wags when you're close; the cat swishes now and then.
+        if (pet.wags && pointerDist < 170 && clip === "sit") {
+          clip = "wag";
+        } else if (!pet.wags && clip === "sit") {
           nextFlick -= dt;
-          if (nextFlick <= 0 && nextFlick > -0.8)
-            frame = Math.floor(-nextFlick / 0.25) % 2 ? "sit" : "wag";
-          else if (nextFlick <= -0.8) nextFlick = 3 + Math.random() * 4;
+          if (nextFlick <= 0 && nextFlick > -1.6) {
+            clip = "wag";
+            clipT = -nextFlick;
+          } else if (nextFlick <= -1.6) nextFlick = 3 + Math.random() * 4;
         }
-        if (now < blinkUntil) frame = "blink";
+        // Looks up at a pointer above it.
+        if (clip === "sit" && py < y - 10 && pointerDist < 260) clip = "lookUp";
+        if (now < blinkUntil && clip !== "pant") clip = "blink";
         // Head tilt when you hold still nearby.
         const still = (now - stillSince) / 1000;
         if (!tiltDone && still > 1.2 && pointerDist < 200) {
           tiltDone = true;
           modeLength = modeTime + 0.9; // tilt window
         }
-        if (modeTime < modeLength && tiltDone) tilt = -9;
+        if (modeTime < modeLength && tiltDone) clip = "tilt";
         // The cat pounces on a cursor that stops at a distance.
         if (
           pet.pounces &&
@@ -870,35 +895,46 @@ export function mountPet({
           say(pick(pet.sounds) ?? "", 900);
           nextBark = 12 + Math.random() * 14;
         }
-        if (idle > SLEEP_AFTER) setMode("yawn", 1.1);
+        // Settles down before it naps.
+        if (idle > LIE_AFTER) setMode("lie");
+        break;
+      }
+      case "lie": {
+        clip = "lie";
+        nextBlink -= dt;
+        if (nextBlink <= 0) {
+          blinkUntil = now + 160;
+          nextBlink = 2 + Math.random() * 3;
+        }
+        if (now < blinkUntil) clip = "lieBlink";
+        if (idle > SLEEP_AFTER) setMode("yawn", 1.3);
         break;
       }
       case "groom":
-        frame = Math.floor(modeTime / 0.3) % 2 ? "blink" : "sit";
-        tilt = Math.floor(modeTime / 0.3) % 2 ? -6 : 0;
+        clip = "groom";
         if (modeTime > modeLength) {
           setMode("sit");
           modeTime = 0.01;
         }
         break;
       case "crouch":
-        frame = "crouch";
+        clip = "crouch";
         facing = px >= x + W / 2 ? 1 : -1;
-        wiggle = Math.sin(modeTime * 40) * 1.5; // butt wiggle
+        wiggle = Math.sin(modeTime * 40) * 0.8; // butt wiggle
         if (modeTime > modeLength) {
           hop(Math.min(40, 14 + pointerDist / 10), 0.45);
           setMode("pounce");
         }
         break;
       case "yawn":
-        frame = modeTime < 0.8 ? "bow" : "blink";
+        clip = modeTime < 0.55 ? "stretch" : "yawn";
         if (modeTime < 0.05)
           say(pet.id === "cat" ? "*stretch*" : "*yawn*", 900);
         if (modeTime > modeLength) setMode("nap");
         break;
       case "nap": {
-        frame = "curl";
-        sy = 1 - 0.035 * (0.5 + 0.5 * Math.sin(modeTime * 2.2));
+        clip = "sleep";
+        sy = 1 - 0.015 * (0.5 + 0.5 * Math.sin(modeTime * 2.2));
         const zs = "z".repeat((Math.floor(modeTime / 0.8) % 3) + 1);
         if (bubble.textContent !== zs) say(zs, 0);
         break;
@@ -915,17 +951,25 @@ export function mountPet({
         land();
       } else lift = -Math.sin(Math.PI * p) * jump.h;
     }
+    // In the air it tucks its legs; it lands on bent legs.
+    if (jump && lift < -6 && clip !== "pounce") clip = "jump";
+    else if (now < landUntil && !moving) clip = "land";
     // Squash and stretch settle back to 1.
     if (mode !== "nap") sy += (1 - sy) * Math.min(1, dt * 12);
     sx += (1 - sx) * Math.min(1, dt * 12);
+    // Turning around: ease the drawn facing, which squashes it through 0.
+    shownFacing += (facing - shownFacing) * Math.min(1, dt * 22);
 
     if (staying) {
       x = anchor.x - window.scrollX;
       y = anchor.y - window.scrollY;
     }
-    paint(pet, frame);
+    paint(pet, clipFrame(art.clips[clip], clipT));
     root.style.transform = `translate3d(${(x + wiggle).toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
-    body.style.transform = `translateY(${lift.toFixed(1)}px) rotate(${(tilt * facing).toFixed(1)}deg) scale(${(facing * sx).toFixed(3)}, ${sy.toFixed(3)})`;
+    body.style.transform = `translateY(${lift.toFixed(1)}px) scale(${(shownFacing * sx).toFixed(3)}, ${sy.toFixed(3)})`;
+    const ground = Math.max(0.45, 1 + lift / (H * 1.4));
+    shadow.style.transform = `scale(${ground.toFixed(3)})`;
+    shadow.style.opacity = ground.toFixed(2);
     raf = requestAnimationFrame(tick);
   };
   raf = requestAnimationFrame(tick);
@@ -972,7 +1016,8 @@ export function mountPet({
       for (let i = 0; i < 4; i++)
         window.setTimeout(() => heart(x + W / 2 - 7, y + 4), i * 120);
       say("yum!", 900);
-      if (mode === "nap" || mode === "yawn") setMode("sit");
+      happyUntil = performance.now() + 1200;
+      if (mode === "nap" || mode === "yawn" || mode === "lie") setMode("sit");
       hop(20, 0.45);
     },
     destroy,
